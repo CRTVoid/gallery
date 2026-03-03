@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Галерея</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        /* Шапка */
+        .header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        /* Навигация по доскам */
+        .boards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #ddd;
+            align-items: center;
+        }
+
+        .board-btn {
+            padding: 10px 20px;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .board-btn:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .board-btn.active {
+            background-color: #bd081c;
+            color: white;
+            border-color: #bd081c;
+        }
+
+        .board-btn.protected {
+            border-color: #ff6b6b;
+            position: relative;
+            padding-right: 35px;
+        }
+
+        .board-btn.protected::after {
+            content: "🔒";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        /* Кнопки управления */
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .shuffle-btn {
+            background-color: #ff9800;
+        }
+
+        .shuffle-btn:hover {
+            background-color: #f57c00;
+            transform: scale(1.1) rotate(180deg);
+        }
+
+        .menu-btn {
+            background-color: #4CAF50;
+        }
+
+        .menu-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+
+        /* Выпадающее меню */
+        .dropdown-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background-color: white;
+            min-width: 250px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 16px;
+            z-index: 100;
+            padding: 8px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            font-size: 15px;
+        }
+
+        .menu-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .menu-item.delete {
+            color: #dc3545;
+        }
+
+        .menu-item.delete:hover {
+            background-color: #ffebee;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 8px 0;
+        }
+
+        /* Форма создания доски */
+        .create-board-form {
+            display: none;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .create-board-form.show {
+            display: block;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+
+        .form-group button.cancel {
+            background-color: #6c757d;
+        }
+
+        .form-group button.cancel:hover {
+            background-color: #5a6268;
+        }
+
+        /* Форма загрузки */
+        .upload-section {
+            display: none;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .upload-section.show {
+            display: block;
+        }
+
+        .upload-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .upload-form input[type="file"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+        }
+
+        .upload-form button {
+            padding: 10px 30px;
+            background-color: #bd081c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .upload-form button:hover {
+            background-color: #8f0615;
+        }
+
+        /* Панель удаления изображений */
+        .delete-panel {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .delete-panel.show {
+            display: flex;
+        }
+
+        .delete-panel button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .select-all-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .select-all-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .deselect-all-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .deselect-all-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-selected-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-selected-btn:hover {
+            background-color: #c82333;
+        }
+
+        .cancel-delete-btn {
+            background-color: #6c757d;
+            color: white;
+            margin-left: auto;
+        }
+
+        .cancel-delete-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .selection-counter {
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Галерея */
+        .gallery {
+            column-count: 4;
+            column-gap: 15px;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            transition: opacity 0.3s;
+        }
+
+        .gallery.shuffling {
+            opacity: 0.7;
+        }
+
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 15px;
+            position: relative;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .gallery-item.selectable {
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+
+        .gallery-item:not(.delete-mode) img {
+            cursor: pointer;
+        }
+
+        .gallery-item.delete-mode img {
+            opacity: 0.9;
+        }
+
+        .gallery-item:hover img {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Чекбокс для выбора изображения */
+        .image-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #bd081c;
+            cursor: pointer;
+            z-index: 5;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+
+        .delete-mode .image-checkbox {
+            display: flex;
+        }
+
+        .image-checkbox.selected {
+            background-color: #bd081c;
+        }
+
+        .image-checkbox.selected::after {
+            content: "✓";
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Кнопка удаления отдельного изображения */
+        .delete-single-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+            z-index: 5;
+            pointer-events: auto;
+        }
+
+        .delete-mode .delete-single-btn {
+            display: flex;
+        }
+
+        .delete-single-btn:hover {
+            transform: scale(1.1);
+            background-color: #c82333;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 16px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close:hover {
+            color: #bbb;
+        }
+
+        .password-modal, .confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content-small {
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 350px;
+            text-align: center;
+        }
+
+        .modal-content-small h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content-small p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .modal-content-small input,
+        .modal-content-small select {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-content-small .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .modal-content-small button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .empty-gallery {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+            font-size: 16px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 1200px) {
+            .gallery { column-count: 3; }
+        }
+        @media (max-width: 900px) {
+            .gallery { column-count: 2; }
+        }
+        @media (max-width: 600px) {
+            .gallery { column-count: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Галерея</h1>
+    </div>
+
+    <!-- Кнопки досок + меню -->
+    <div class="boards-container" id="boardsContainer"></div>
+
+    <!-- Форма создания доски -->
+    <div class="create-board-form" id="createBoardForm">
+        <div class="form-group">
+            <input type="text" id="newBoardName" placeholder="Название доски" required>
+            <input type="password" id="newBoardPassword" placeholder="Пароль (необязательно)">
+            <button onclick="createNewBoard()">Создать</button>
+            <button class="cancel" onclick="toggleCreateBoardForm()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Форма загрузки изображений -->
+    <div class="upload-section" id="uploadSection">
+        <form class="upload-form" id="uploadForm">
+            <input type="file" id="imageUpload" accept="image/*" multiple required>
+            <button type="submit">Загрузить изображения</button>
+        </form>
+    </div>
+
+    <!-- Панель удаления изображений -->
+    <div class="delete-panel" id="deletePanel">
+        <button class="select-all-btn" onclick="selectAllImages()">Выбрать все</button>
+        <button class="deselect-all-btn" onclick="deselectAllImages()">Снять выбор</button>
+        <button class="delete-selected-btn" onclick="confirmDeleteSelected()">Удалить выбранные</button>
+        <span class="selection-counter" id="selectionCounter">Выбрано: 0</span>
+        <button class="cancel-delete-btn" onclick="exitDeleteMode()">Отмена</button>
+    </div>
+
+    <!-- Галерея -->
+    <div class="gallery" id="gallery"></div>
+
+    <!-- Модальное окно для увеличенного изображения -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- Модальное окно для ввода пароля -->
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content-small">
+            <h3>Введите пароль</h3>
+            <input type="password" id="boardPassword" placeholder="Пароль">
+            <div class="buttons">
+                <button class="btn-success" onclick="checkPassword()">Подтвердить</button>
+                <button class="btn-secondary" onclick="closePasswordModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для удаления доски -->
+    <div id="deleteBoardModal" class="password-modal">
+        <div class="modal-content-small">
+            <h3>Удаление доски</h3>
+            <p>Выберите доску для удаления:</p>
+            <select id="boardToDelete" class="board-select"></select>
+            <div class="buttons">
+                <button class="btn-danger" onclick="confirmDeleteBoard()">Удалить</button>
+                <button class="btn-secondary" onclick="closeDeleteBoardModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения -->
+    <div id="confirmModal" class="password-modal">
+        <div class="modal-content-small">
+            <h3 id="confirmTitle">Подтверждение</h3>
+            <p id="confirmMessage">Вы уверены?</p>
+            <div class="buttons">
+                <button class="btn-danger" id="confirmYesBtn">Да</button>
+                <button class="btn-secondary" onclick="closeConfirmModal()">Нет</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Состояние приложения
+        let boards = JSON.parse(localStorage.getItem('boards')) || {
+            'Основная': { password: null, images: [] }
+        };
+        let currentBoard = 'Основная';
+        let pendingBoardAccess = null;
+        let selectedImages = new Set();
+        let deleteMode = false;
+
+        // Инициализация
+        function init() {
+            renderBoards();
+            renderGallery();
+        }
+
+        // Сохранение в localStorage
+        function saveToStorage() {
+            localStorage.setItem('boards', JSON.stringify(boards));
+        }
+
+        // Отображение кнопок досок
+        function renderBoards() {
+            const container = document.getElementById('boardsContainer');
+            container.innerHTML = '';
+
+            // Кнопки досок
+            Object.keys(boards).forEach(boardName => {
+                const btn = document.createElement('button');
+                btn.className = `board-btn ${boardName === currentBoard ? 'active' : ''} ${boards[boardName].password ? 'protected' : ''}`;
+                btn.textContent = boardName;
+                btn.onclick = () => switchBoard(boardName);
+                container.appendChild(btn);
+            });
+
+            // Контейнер для кнопок управления
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'control-buttons';
+
+            // Кнопка перемешивания
+            const shuffleBtn = document.createElement('button');
+            shuffleBtn.className = 'control-btn shuffle-btn';
+            shuffleBtn.innerHTML = '↻';
+            shuffleBtn.title = 'Перемешать изображения';
+            shuffleBtn.onclick = shuffleImages;
+            controlsDiv.appendChild(shuffleBtn);
+
+            // Кнопка меню
+            const menuBtn = document.createElement('button');
+            menuBtn.className = 'control-btn menu-btn';
+            menuBtn.innerHTML = '☰';
+            menuBtn.onclick = toggleMenu;
+            controlsDiv.appendChild(menuBtn);
+
+            container.appendChild(controlsDiv);
+
+            // Выпадающее меню
+            const dropdown = document.createElement('div');
+            dropdown.className = 'dropdown-menu';
+            dropdown.innerHTML = `
+                <div class="dropdown-content" id="dropdownContent">
+                    <div class="menu-item" onclick="toggleCreateBoardForm()">➕ Создать новую доску</div>
+                    <div class="menu-item" onclick="toggleUploadForm()">📤 Загрузить изображения</div>
+                    <div class="menu-item" onclick="enterDeleteMode()">🗑 Удалить изображения</div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-item delete" onclick="showDeleteBoardModal()">❌ Удалить доску</div>
+                </div>
+            `;
+            container.appendChild(dropdown);
+        }
+
+        // Перемешивание изображений
+        function shuffleImages() {
+            const images = boards[currentBoard]?.images;
+            if (!images || images.length === 0) {
+                alert('Нет изображений для перемешивания');
+                return;
+            }
+
+            // Добавляем визуальный эффект
+            const gallery = document.getElementById('gallery');
+            gallery.classList.add('shuffling');
+
+            // Алгоритм Фишера-Йейтса для случайного перемешивания
+            for (let i = images.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [images[i], images[j]] = [images[j], images[i]];
+            }
+
+            saveToStorage();
+            
+            // Небольшая задержка для визуального эффекта
+            setTimeout(() => {
+                renderGallery();
+                gallery.classList.remove('shuffling');
+            }, 200);
+        }
+
+        // Переключение меню
+        function toggleMenu() {
+            const dropdown = document.getElementById('dropdownContent');
+            dropdown.classList.toggle('show');
+            
+            if (dropdown.classList.contains('show')) {
+                document.addEventListener('click', closeMenuOnClickOutside);
+            }
+        }
+
+        function closeMenuOnClickOutside(event) {
+            const dropdown = document.getElementById('dropdownContent');
+            const menuBtn = document.querySelector('.menu-btn');
+            
+            if (!dropdown.contains(event.target) && !menuBtn.contains(event.target)) {
+                dropdown.classList.remove('show');
+                document.removeEventListener('click', closeMenuOnClickOutside);
+            }
+        }
+
+        function closeMenu() {
+            document.getElementById('dropdownContent').classList.remove('show');
+        }
+
+        // Переключение формы создания доски
+        function toggleCreateBoardForm() {
+            const form = document.getElementById('createBoardForm');
+            form.classList.toggle('show');
+            closeMenu();
+        }
+
+        // Переключение формы загрузки
+        function toggleUploadForm() {
+            const form = document.getElementById('uploadSection');
+            form.classList.toggle('show');
+            closeMenu();
+        }
+
+        // Вход в режим удаления
+        function enterDeleteMode() {
+            deleteMode = true;
+            document.getElementById('deletePanel').classList.add('show');
+            closeMenu();
+            renderGallery();
+        }
+
+        // Выход из режима удаления
+        function exitDeleteMode() {
+            deleteMode = false;
+            document.getElementById('deletePanel').classList.remove('show');
+            selectedImages.clear();
+            renderGallery();
+        }
+
+        // Создание новой доски
+        function createNewBoard() {
+            const name = document.getElementById('newBoardName').value.trim();
+            const password = document.getElementById('newBoardPassword').value.trim();
+
+            if (!name) {
+                alert('Введите название доски');
+                return;
+            }
+
+            if (boards[name]) {
+                alert('Доска с таким названием уже существует');
+                return;
+            }
+
+            boards[name] = {
+                password: password || null,
+                images: []
+            };
+
+            saveToStorage();
+            renderBoards();
+            
+            document.getElementById('newBoardName').value = '';
+            document.getElementById('newBoardPassword').value = '';
+            toggleCreateBoardForm();
+        }
+
+        // Переключение доски
+        function switchBoard(boardName) {
+            if (boards[boardName].password) {
+                pendingBoardAccess = boardName;
+                document.getElementById('passwordModal').style.display = 'flex';
+            } else {
+                currentBoard = boardName;
+                renderBoards();
+                exitDeleteMode();
+                renderGallery();
+            }
+        }
+
+        // Проверка пароля
+        function checkPassword() {
+            const password = document.getElementById('boardPassword').value;
+            if (pendingBoardAccess && boards[pendingBoardAccess].password === password) {
+                currentBoard = pendingBoardAccess;
+                renderBoards();
+                renderGallery();
+                closePasswordModal();
+            } else {
+                alert('Неверный пароль!');
+            }
+            document.getElementById('boardPassword').value = '';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            pendingBoardAccess = null;
+            document.getElementById('boardPassword').value = '';
+        }
+
+        // Показать модальное окно удаления доски
+        function showDeleteBoardModal() {
+            const select = document.getElementById('boardToDelete');
+            select.innerHTML = '';
+            
+            Object.keys(boards).forEach(boardName => {
+                if (boardName !== 'Основная') {
+                    const option = document.createElement('option');
+                    option.value = boardName;
+                    option.textContent = boardName + (boards[boardName].password ? ' (защищена)' : '');
+                    select.appendChild(option);
+                }
+            });
+            
+            document.getElementById('deleteBoardModal').style.display = 'flex';
+            closeMenu();
+        }
+
+        function closeDeleteBoardModal() {
+            document.getElementById('deleteBoardModal').style.display = 'none';
+        }
+
+        // Подтверждение удаления доски
+        function confirmDeleteBoard() {
+            const boardName = document.getElementById('boardToDelete').value;
+            if (boardName) {
+                showConfirmDialog(
+                    'Удаление доски',
+                    `Вы уверены, что хотите удалить доску "${boardName}"? Все изображения будут безвозвратно удалены.`,
+                    () => {
+                        deleteBoard(boardName);
+                        closeDeleteBoardModal();
+                    }
+                );
+            }
+        }
+
+        // Удаление доски
+        function deleteBoard(boardName) {
+            delete boards[boardName];
+            
+            if (currentBoard === boardName) {
+                currentBoard = 'Основная';
+            }
+            
+            saveToStorage();
+            renderBoards();
+            renderGallery();
+        }
+
+        // Загрузка изображений
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const files = document.getElementById('imageUpload').files;
+            
+            if (files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    if (!boards[currentBoard].images) {
+                        boards[currentBoard].images = [];
+                    }
+                    
+                    boards[currentBoard].images.push({
+                        src: event.target.result,
+                        name: file.name,
+                        date: new Date().toISOString(),
+                        id: Date.now() + Math.random() + file.name
+                    });
+                    
+                    saveToStorage();
+                    renderGallery();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            document.getElementById('imageUpload').value = '';
+        });
+
+        // Отображение галереи
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            const images = boards[currentBoard]?.images || [];
+
+            if (images.length === 0) {
+                gallery.innerHTML = '<div class="empty-gallery">Загрузите изображения в эту доску</div>';
+                updateSelectionCounter();
+                return;
+            }
+
+            let html = '';
+            images.forEach(img => {
+                const isSelected = selectedImages.has(img.id);
+                html += `
+                    <div class="gallery-item ${deleteMode ? 'delete-mode' : ''}" data-id="${img.id}">
+                        <div class="image-checkbox ${isSelected ? 'selected' : ''}" onclick="toggleImageSelection('${img.id}', event)"></div>
+                        <img src="${img.src}" alt="${img.name}" onclick="handleImageClick('${img.id}', '${img.src.replace(/'/g, "\\'")}')">
+                        <button class="delete-single-btn" onclick="confirmDeleteImage('${img.id}', event)">✕</button>
+                    </div>
+                `;
+            });
+            
+            gallery.innerHTML = html;
+            updateSelectionCounter();
+        }
+
+        // Обработка клика по изображению
+        function handleImageClick(imageId, imgSrc) {
+            if (deleteMode) {
+                toggleImageSelection(imageId, event);
+            } else {
+                openModal(imgSrc);
+            }
+        }
+
+        // Переключение выбора изображения
+        function toggleImageSelection(imageId, event) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            if (selectedImages.has(imageId)) {
+                selectedImages.delete(imageId);
+            } else {
+                selectedImages.add(imageId);
+            }
+            
+            // Обновляем класс чекбокса напрямую
+            const checkbox = event.target;
+            if (selectedImages.has(imageId)) {
+                checkbox.classList.add('selected');
+            } else {
+                checkbox.classList.remove('selected');
+            }
+            
+            updateSelectionCounter();
+        }
+
+        // Выбрать все изображения
+        function selectAllImages() {
+            const images = boards[currentBoard]?.images || [];
+            images.forEach(img => selectedImages.add(img.id));
+            updateSelectionCounter();
+            renderGallery();
+        }
+
+        // Снять выбор со всех
+        function deselectAllImages() {
+            selectedImages.clear();
+            updateSelectionCounter();
+            renderGallery();
+        }
+
+        // Обновление счетчика
+        function updateSelectionCounter() {
+            document.getElementById('selectionCounter').textContent = `Выбрано: ${selectedImages.size}`;
+        }
+
+        // Подтверждение удаления одного изображения
+        function confirmDeleteImage(imageId, event) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            showConfirmDialog(
+                'Удаление изображения',
+                'Вы уверены, что хотите удалить это изображение?',
+                () => deleteSingleImage(imageId)
+            );
+        }
+
+        // Удаление одного изображения
+        function deleteSingleImage(imageId) {
+            const images = boards[currentBoard].images;
+            const index = images.findIndex(img => img.id === imageId);
+            
+            if (index !== -1) {
+                images.splice(index, 1);
+                selectedImages.delete(imageId);
+                saveToStorage();
+                
+                if (images.length === 0) {
+                    exitDeleteMode();
+                } else {
+                    renderGallery();
+                }
+            }
+        }
+
+        // Подтверждение удаления выбранных
+        function confirmDeleteSelected() {
+            if (selectedImages.size === 0) {
+                alert('Нет выбранных изображений');
+                return;
+            }
+
+            showConfirmDialog(
+                'Удаление изображений',
+                `Вы уверены, что хотите удалить ${selectedImages.size} изображение(й)?`,
+                deleteSelectedImages
+            );
+        }
+
+        // Удаление нескольких изображений
+        function deleteSelectedImages() {
+            const images = boards[currentBoard].images;
+            boards[currentBoard].images = images.filter(img => !selectedImages.has(img.id));
+            selectedImages.clear();
+            saveToStorage();
+            
+            if (boards[currentBoard].images.length === 0) {
+                exitDeleteMode();
+            } else {
+                renderGallery();
+            }
+        }
+
+        // Показать диалог подтверждения
+        function showConfirmDialog(title, message, onConfirm) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmYesBtn').onclick = () => {
+                onConfirm();
+                closeConfirmModal();
+            };
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        // Закрытие модальных окон
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
+        function openModal(imgSrc) {
+            document.getElementById('modalImage').src = imgSrc;
+            document.getElementById('imageModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closePasswordModal();
+                closeConfirmModal();
+                closeDeleteBoardModal();
+                document.getElementById('dropdownContent').classList.remove('show');
+                if (deleteMode) {
+                    exitDeleteMode();
+                }
+            }
+        });
+
+        // Инициализация
+        init();
+    </script>
+</body>
+</html>
