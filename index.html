@@ -11,7 +11,6 @@
             box-sizing: border-box;
         }
 
-        /* Светлая тема (по умолчанию) */
         :root {
             --bg-color: #f0f0f0;
             --text-color: #333;
@@ -32,9 +31,9 @@
             --dropdown-shadow: rgba(0,0,0,0.2);
             --menu-item-hover: #f5f5f5;
             --selection-counter: #6c757d;
+            --upload-progress-bg: #e0e0e0;
         }
 
-        /* Тёмная тема */
         body.dark-mode {
             --bg-color: #1a1a1a;
             --text-color: #f0f0f0;
@@ -55,6 +54,7 @@
             --dropdown-shadow: rgba(0,0,0,0.5);
             --menu-item-hover: #404040;
             --selection-counter: #aaa;
+            --upload-progress-bg: #404040;
         }
 
         body {
@@ -65,7 +65,6 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Шапка */
         .header {
             margin-bottom: 30px;
         }
@@ -73,10 +72,8 @@
         h1 {
             color: var(--text-color);
             font-size: 28px;
-            transition: color 0.3s;
         }
 
-        /* Навигация по доскам */
         .boards-container {
             display: flex;
             flex-wrap: wrap;
@@ -85,7 +82,6 @@
             padding: 20px 0;
             border-bottom: 2px solid var(--border-color);
             align-items: center;
-            transition: border-color 0.3s;
         }
 
         .board-btn {
@@ -125,7 +121,6 @@
             font-size: 14px;
         }
 
-        /* Кнопки управления */
         .control-buttons {
             display: flex;
             gap: 10px;
@@ -174,7 +169,6 @@
             transform: scale(1.1);
         }
 
-        /* Выпадающее меню */
         .dropdown-menu {
             position: relative;
             display: inline-block;
@@ -191,7 +185,6 @@
             border-radius: 16px;
             z-index: 100;
             padding: 8px;
-            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .dropdown-content.show {
@@ -229,15 +222,12 @@
             height: 1px;
             background-color: var(--border-color);
             margin: 8px 0;
-            transition: background-color 0.3s;
         }
 
-        /* Темный режим для меню */
         body.dark-mode .menu-item.delete:hover {
             background-color: #442326;
         }
 
-        /* Форма создания доски */
         .create-board-form {
             display: none;
             margin-bottom: 20px;
@@ -245,7 +235,6 @@
             background-color: var(--panel-bg);
             border-radius: 16px;
             box-shadow: 0 2px 4px var(--panel-shadow);
-            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .create-board-form.show {
@@ -266,7 +255,6 @@
             flex: 1;
             background-color: var(--board-bg);
             color: var(--text-color);
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
 
         .form-group button {
@@ -276,7 +264,6 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         .form-group button:hover {
@@ -291,7 +278,6 @@
             background-color: #5a6268;
         }
 
-        /* Форма загрузки */
         .upload-section {
             display: none;
             margin: 20px 0;
@@ -299,7 +285,6 @@
             background-color: var(--panel-bg);
             border-radius: 16px;
             box-shadow: 0 2px 4px var(--panel-shadow);
-            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .upload-section.show {
@@ -308,37 +293,76 @@
 
         .upload-form {
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
+        }
+
+        .file-input-container {
+            position: relative;
+            width: 100%;
         }
 
         .upload-form input[type="file"] {
-            flex: 1;
-            padding: 10px;
+            width: 100%;
+            padding: 15px;
             border: 2px dashed var(--input-border);
             border-radius: 8px;
             background-color: var(--board-bg);
             color: var(--text-color);
-            transition: background-color 0.3s, border-color 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-form input[type="file"]:hover {
+            border-color: #bd081c;
         }
 
         .upload-form button {
-            padding: 10px 30px;
+            padding: 12px 30px;
             background-color: #bd081c;
             color: white;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            align-self: flex-end;
         }
 
-        .upload-form button:hover {
+        .upload-form button:hover:not(:disabled) {
             background-color: #8f0615;
         }
 
-        /* Панель удаления изображений */
+        .upload-form button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-progress {
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: var(--upload-progress-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #bd081c);
+            border-radius: 10px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+            color: var(--text-color);
+            text-align: center;
+        }
+
         .delete-panel {
             display: none;
             margin: 20px 0;
@@ -349,7 +373,6 @@
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
-            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .delete-panel.show {
@@ -362,7 +385,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s;
         }
 
         .select-all-btn {
@@ -406,16 +428,13 @@
             color: var(--selection-counter);
             font-size: 14px;
             font-weight: 500;
-            transition: color 0.3s;
         }
 
-        /* Галерея */
         .gallery {
             column-gap: 15px;
             width: 100%;
             max-width: 1600px;
             margin: 0 auto;
-            transition: opacity 0.3s;
         }
 
         .gallery[data-columns="1"] { column-count: 1; }
@@ -427,7 +446,6 @@
         .gallery[data-columns="7"] { column-count: 7; }
         .gallery[data-columns="8"] { column-count: 8; }
 
-        /* Даже на самых маленьких экранах - точное количество столбцов, которое выбрал пользователь */
         @media (max-width: 479px) {
             .gallery[data-columns="1"] { column-count: 1; }
             .gallery[data-columns="2"] { column-count: 2; }
@@ -452,17 +470,12 @@
             width: 100%;
         }
 
-        .gallery-item.selectable {
-            cursor: pointer;
-        }
-
         .gallery-item img {
             width: 100%;
             height: auto;
             border-radius: 16px;
             box-shadow: 0 4px 6px var(--panel-shadow);
             display: block;
-            transition: box-shadow 0.3s;
         }
 
         .gallery-item:not(.delete-mode) img {
@@ -477,7 +490,6 @@
             box-shadow: 0 8px 12px var(--panel-shadow);
         }
 
-        /* Чекбокс для выбора изображения */
         .image-checkbox {
             position: absolute;
             top: 10px;
@@ -492,7 +504,6 @@
             display: none;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
             pointer-events: auto;
         }
 
@@ -511,7 +522,6 @@
             font-weight: bold;
         }
 
-        /* Кнопка удаления отдельного изображения */
         .delete-single-btn {
             position: absolute;
             bottom: 10px;
@@ -527,7 +537,6 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: all 0.2s;
             z-index: 5;
             pointer-events: auto;
         }
@@ -541,7 +550,6 @@
             background-color: #c82333;
         }
 
-        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -571,7 +579,6 @@
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         .close:hover {
@@ -590,7 +597,6 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            transition: background-color 0.3s;
         }
 
         .modal-content-small {
@@ -600,19 +606,16 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
-            transition: background-color 0.3s;
         }
 
         .modal-content-small h3 {
             margin-bottom: 20px;
             color: var(--modal-text);
-            transition: color 0.3s;
         }
 
         .modal-content-small p {
             margin-bottom: 20px;
             color: var(--modal-text-secondary);
-            transition: color 0.3s;
         }
 
         .modal-content-small input,
@@ -625,7 +628,6 @@
             font-size: 14px;
             background-color: var(--board-bg);
             color: var(--text-color);
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
 
         .modal-content-small .buttons {
@@ -642,12 +644,10 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s;
             flex: 1;
             min-width: 120px;
         }
 
-        /* Слайдер для настройки столбцов */
         .grid-slider-container {
             margin: 20px 0;
         }
@@ -669,26 +669,7 @@
             border-radius: 50%;
             background: #bd081c;
             cursor: pointer;
-            transition: transform 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .grid-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .grid-slider::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #bd081c;
-            cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .grid-slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
         }
 
         .grid-value {
@@ -704,7 +685,6 @@
             margin-top: 5px;
             color: var(--modal-text-secondary);
             font-size: 12px;
-            transition: color 0.3s;
         }
 
         .btn-primary {
@@ -751,46 +731,18 @@
             background-color: var(--empty-gallery-bg);
             border-radius: 16px;
             box-shadow: 0 2px 4px var(--panel-shadow);
-            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
         }
 
-        /* Мобильные улучшения */
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .board-btn {
-                padding: 8px 16px;
-                font-size: 14px;
-            }
-
-            .control-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-            }
-
-            .delete-panel button {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-
-            .modal-content-small {
-                padding: 20px;
-            }
-
-            .modal-content-small button {
-                padding: 10px 15px;
-                min-width: 100px;
-            }
+            body { padding: 10px; }
+            h1 { font-size: 24px; }
+            .board-btn { padding: 8px 16px; font-size: 14px; }
+            .control-btn { width: 40px; height: 40px; font-size: 18px; }
+            .delete-panel button { padding: 8px 12px; font-size: 13px; }
+            .modal-content-small { padding: 20px; }
+            .modal-content-small button { padding: 10px 15px; min-width: 100px; }
         }
 
-        /* Для очень маленьких экранов с большим количеством столбцов */
         @media (max-width: 480px) {
             .gallery[data-columns="5"] .gallery-item img,
             .gallery[data-columns="6"] .gallery-item img,
@@ -800,17 +752,6 @@
             }
         }
 
-        /* Переключатель темы в меню */
-        .theme-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .theme-toggle span {
-            font-size: 14px;
-        }
-
         .theme-toggle-switch {
             width: 50px;
             height: 26px;
@@ -818,7 +759,6 @@
             border-radius: 13px;
             position: relative;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         body.dark-mode .theme-toggle-switch {
@@ -840,6 +780,31 @@
         body.dark-mode .theme-toggle-switch::after {
             transform: translateX(24px);
         }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideIn 0.3s;
+            border-left: 4px solid #bd081c;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -847,10 +812,8 @@
         <h1>Моя Pinterest галерея</h1>
     </div>
 
-    <!-- Кнопки досок + меню -->
     <div class="boards-container" id="boardsContainer"></div>
 
-    <!-- Форма создания доски -->
     <div class="create-board-form" id="createBoardForm">
         <div class="form-group">
             <input type="text" id="newBoardName" placeholder="Название доски" required>
@@ -860,15 +823,21 @@
         </div>
     </div>
 
-    <!-- Форма загрузки изображений -->
     <div class="upload-section" id="uploadSection">
         <form class="upload-form" id="uploadForm">
-            <input type="file" id="imageUpload" accept="image/*" multiple required>
-            <button type="submit">Загрузить изображения</button>
+            <div class="file-input-container">
+                <input type="file" id="imageUpload" accept="image/*" multiple required>
+            </div>
+            <button type="submit" id="uploadButton">Загрузить изображения</button>
         </form>
+        <div class="upload-progress" id="uploadProgress" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Загрузка... 0%</div>
+        </div>
     </div>
 
-    <!-- Панель удаления изображений -->
     <div class="delete-panel" id="deletePanel">
         <button class="select-all-btn" onclick="selectAllImages()">Выбрать все</button>
         <button class="deselect-all-btn" onclick="deselectAllImages()">Снять выбор</button>
@@ -877,16 +846,13 @@
         <button class="cancel-delete-btn" onclick="exitDeleteMode()">Отмена</button>
     </div>
 
-    <!-- Галерея -->
     <div class="gallery" id="gallery" data-columns="4"></div>
 
-    <!-- Модальное окно для увеличенного изображения -->
     <div id="imageModal" class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
         <img class="modal-content" id="modalImage">
     </div>
 
-    <!-- Модальное окно для ввода пароля -->
     <div id="passwordModal" class="password-modal">
         <div class="modal-content-small">
             <h3>Введите пароль</h3>
@@ -898,7 +864,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для удаления доски -->
     <div id="deleteBoardModal" class="password-modal">
         <div class="modal-content-small">
             <h3>Удаление доски</h3>
@@ -911,7 +876,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно подтверждения -->
     <div id="confirmModal" class="password-modal">
         <div class="modal-content-small">
             <h3 id="confirmTitle">Подтверждение</h3>
@@ -923,7 +887,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно настройки сетки -->
     <div id="gridModal" class="grid-modal">
         <div class="modal-content-small">
             <h3>Настройка сетки</h3>
@@ -944,6 +907,14 @@
     </div>
 
     <script>
+        // ==============================================
+        // ВАШ ТОКЕН И НАСТРОЙКИ (уже вставлены)
+        // ==============================================
+        const YANDEX_CONFIG = {
+            token: 'y0__xDgvdT3ARjHvD4gvvb5zhYu5mVVce8DtDhJj1_lg-nhuOrWxw',  // Ваш токен
+            folder: 'gallery'  // Папка на Диске
+        };
+
         // Состояние приложения
         let boards = JSON.parse(localStorage.getItem('boards')) || {
             'Основная': { password: null, images: [] }
@@ -953,21 +924,147 @@
         let selectedImages = new Set();
         let deleteMode = false;
         
-        // Настройки сетки
         let gridSettings = JSON.parse(localStorage.getItem('gridSettings')) || { columns: 4 };
-        
-        // Настройки темы
         let darkMode = localStorage.getItem('darkMode') === 'true';
 
-        // Инициализация
-        function init() {
-            applyTheme();
-            applyGridSettingsFromStorage();
-            renderBoards();
-            renderGallery();
+        // ==============================================
+        // ФУНКЦИИ ЗАГРУЗКИ НА ЯНДЕКС.ДИСК
+        // ==============================================
+
+        async function uploadToYandexDisk(file) {
+            try {
+                // 1. Создаём уникальное имя файла
+                const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+                const path = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/${fileName}`);
+                
+                // 2. Получаем URL для загрузки
+                const uploadUrlResponse = await fetch(
+                    `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${path}&overwrite=true`,
+                    {
+                        headers: {
+                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                        }
+                    }
+                );
+                
+                if (!uploadUrlResponse.ok) {
+                    const error = await uploadUrlResponse.json();
+                    throw new Error(error.message || 'Не удалось получить URL для загрузки');
+                }
+                
+                const { href } = await uploadUrlResponse.json();
+                
+                // 3. Загружаем файл
+                const uploadResponse = await fetch(href, {
+                    method: 'PUT',
+                    body: file
+                });
+                
+                if (!uploadResponse.ok) {
+                    throw new Error('Ошибка при загрузке файла');
+                }
+                
+                // 4. Делаем файл публичным
+                const publishResponse = await fetch(
+                    `https://cloud-api.yandex.net/v1/disk/resources/publish?path=${path}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                        }
+                    }
+                );
+                
+                if (!publishResponse.ok) {
+                    throw new Error('Не удалось опубликовать файл');
+                }
+                
+                // 5. Получаем метаданные файла с публичной ссылкой
+                const metaResponse = await fetch(
+                    `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
+                    {
+                        headers: {
+                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                        }
+                    }
+                );
+                
+                const meta = await metaResponse.json();
+                
+                // 6. Конвертируем публичную ссылку в прямую
+                const publicUrl = meta.public_url;
+                const fileId = publicUrl.split('/').pop();
+                const directUrl = `https://downloader.disk.yandex.ru/preview/${fileId}`;
+                
+                return directUrl;
+                
+            } catch (error) {
+                console.error('Ошибка загрузки на Яндекс.Диск:', error);
+                throw error;
+            }
         }
 
-        // Применение темы
+        async function uploadMultipleToYandex(files) {
+            const uploadButton = document.getElementById('uploadButton');
+            const progressDiv = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            uploadButton.disabled = true;
+            progressDiv.style.display = 'block';
+
+            const uploadedImages = [];
+            let completed = 0;
+            let errors = 0;
+
+            for (const file of files) {
+                try {
+                    progressText.textContent = `Загрузка... ${Math.round((completed / files.length) * 100)}%`;
+                    
+                    const imageUrl = await uploadToYandexDisk(file);
+                    
+                    uploadedImages.push({
+                        src: imageUrl,
+                        name: file.name,
+                        date: new Date().toISOString(),
+                        id: Date.now() + Math.random() + file.name
+                    });
+
+                    completed++;
+                    const percent = (completed / files.length) * 100;
+                    progressFill.style.width = `${percent}%`;
+                    progressText.textContent = `Загрузка... ${Math.round(percent)}%`;
+
+                } catch (error) {
+                    errors++;
+                    console.error('Ошибка загрузки файла:', file.name, error);
+                }
+            }
+
+            if (uploadedImages.length > 0) {
+                if (!boards[currentBoard].images) {
+                    boards[currentBoard].images = [];
+                }
+                
+                boards[currentBoard].images.push(...uploadedImages);
+                saveToStorage();
+                renderGallery();
+                
+                alert(`Загружено ${uploadedImages.length} изображений${errors > 0 ? `, ${errors} ошибок` : ''}`);
+            } else {
+                alert('Не удалось загрузить ни одного файла');
+            }
+
+            uploadButton.disabled = false;
+            progressDiv.style.display = 'none';
+            progressFill.style.width = '0%';
+            document.getElementById('imageUpload').value = '';
+        }
+
+        // ==============================================
+        // ОСНОВНЫЕ ФУНКЦИИ ГАЛЕРЕИ
+        // ==============================================
+
         function applyTheme() {
             if (darkMode) {
                 document.body.classList.add('dark-mode');
@@ -976,16 +1073,13 @@
             }
         }
 
-        // Переключение темы
         function toggleDarkMode() {
             darkMode = !darkMode;
             localStorage.setItem('darkMode', darkMode);
             applyTheme();
-            // Обновляем меню, чтобы показать актуальное состояние переключателя
             renderBoards();
         }
 
-        // Применение настроек сетки из хранилища
         function applyGridSettingsFromStorage() {
             const gallery = document.getElementById('gallery');
             gallery.setAttribute('data-columns', gridSettings.columns);
@@ -993,14 +1087,12 @@
             document.getElementById('gridValue').textContent = gridSettings.columns;
         }
 
-        // Сохранение настроек сетки
         function saveGridSettings() {
             localStorage.setItem('gridSettings', JSON.stringify(gridSettings));
             const gallery = document.getElementById('gallery');
             gallery.setAttribute('data-columns', gridSettings.columns);
         }
 
-        // Открытие модального окна настройки сетки
         function openGridModal() {
             document.getElementById('gridSlider').value = gridSettings.columns;
             document.getElementById('gridValue').textContent = gridSettings.columns;
@@ -1008,12 +1100,10 @@
             closeMenu();
         }
 
-        // Закрытие модального окна сетки
         function closeGridModal() {
             document.getElementById('gridModal').style.display = 'none';
         }
 
-        // Применение настроек сетки
         function applyGridSettings() {
             const slider = document.getElementById('gridSlider');
             gridSettings.columns = parseInt(slider.value);
@@ -1022,22 +1112,14 @@
             closeGridModal();
         }
 
-        // Обновление значения при изменении слайдера
-        document.getElementById('gridSlider')?.addEventListener('input', function(e) {
-            document.getElementById('gridValue').textContent = e.target.value;
-        });
-
-        // Сохранение в localStorage
         function saveToStorage() {
             localStorage.setItem('boards', JSON.stringify(boards));
         }
 
-        // Отображение кнопок досок
         function renderBoards() {
             const container = document.getElementById('boardsContainer');
             container.innerHTML = '';
 
-            // Кнопки досок
             Object.keys(boards).forEach(boardName => {
                 const btn = document.createElement('button');
                 btn.className = `board-btn ${boardName === currentBoard ? 'active' : ''} ${boards[boardName].password ? 'protected' : ''}`;
@@ -1046,11 +1128,9 @@
                 container.appendChild(btn);
             });
 
-            // Контейнер для кнопок управления
             const controlsDiv = document.createElement('div');
             controlsDiv.className = 'control-buttons';
 
-            // Кнопка настройки сетки
             const gridBtn = document.createElement('button');
             gridBtn.className = 'control-btn grid-btn';
             gridBtn.innerHTML = '⊞';
@@ -1058,7 +1138,6 @@
             gridBtn.onclick = openGridModal;
             controlsDiv.appendChild(gridBtn);
 
-            // Кнопка перемешивания
             const shuffleBtn = document.createElement('button');
             shuffleBtn.className = 'control-btn shuffle-btn';
             shuffleBtn.innerHTML = '↻';
@@ -1066,7 +1145,6 @@
             shuffleBtn.onclick = shuffleImages;
             controlsDiv.appendChild(shuffleBtn);
 
-            // Кнопка меню
             const menuBtn = document.createElement('button');
             menuBtn.className = 'control-btn menu-btn';
             menuBtn.innerHTML = '☰';
@@ -1075,7 +1153,6 @@
 
             container.appendChild(controlsDiv);
 
-            // Выпадающее меню
             const dropdown = document.createElement('div');
             dropdown.className = 'dropdown-menu';
             dropdown.innerHTML = `
@@ -1095,7 +1172,6 @@
             container.appendChild(dropdown);
         }
 
-        // Перемешивание изображений
         function shuffleImages() {
             const images = boards[currentBoard]?.images;
             if (!images || images.length === 0) {
@@ -1106,7 +1182,6 @@
             const gallery = document.getElementById('gallery');
             gallery.classList.add('shuffling');
 
-            // Алгоритм Фишера-Йейтса
             for (let i = images.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [images[i], images[j]] = [images[j], images[i]];
@@ -1120,7 +1195,6 @@
             }, 200);
         }
 
-        // Переключение меню
         function toggleMenu() {
             const dropdown = document.getElementById('dropdownContent');
             dropdown.classList.toggle('show');
@@ -1144,21 +1218,18 @@
             document.getElementById('dropdownContent').classList.remove('show');
         }
 
-        // Переключение формы создания доски
         function toggleCreateBoardForm() {
             const form = document.getElementById('createBoardForm');
             form.classList.toggle('show');
             closeMenu();
         }
 
-        // Переключение формы загрузки
         function toggleUploadForm() {
             const form = document.getElementById('uploadSection');
             form.classList.toggle('show');
             closeMenu();
         }
 
-        // Вход в режим удаления
         function enterDeleteMode() {
             deleteMode = true;
             document.getElementById('deletePanel').classList.add('show');
@@ -1166,7 +1237,6 @@
             renderGallery();
         }
 
-        // Выход из режима удаления
         function exitDeleteMode() {
             deleteMode = false;
             document.getElementById('deletePanel').classList.remove('show');
@@ -1174,7 +1244,6 @@
             renderGallery();
         }
 
-        // Создание новой доски
         function createNewBoard() {
             const name = document.getElementById('newBoardName').value.trim();
             const password = document.getElementById('newBoardPassword').value.trim();
@@ -1202,7 +1271,6 @@
             toggleCreateBoardForm();
         }
 
-        // Переключение доски
         function switchBoard(boardName) {
             if (boards[boardName].password) {
                 pendingBoardAccess = boardName;
@@ -1215,7 +1283,6 @@
             }
         }
 
-        // Проверка пароля
         function checkPassword() {
             const password = document.getElementById('boardPassword').value;
             if (pendingBoardAccess && boards[pendingBoardAccess].password === password) {
@@ -1235,7 +1302,6 @@
             document.getElementById('boardPassword').value = '';
         }
 
-        // Показать модальное окно удаления доски
         function showDeleteBoardModal() {
             const select = document.getElementById('boardToDelete');
             select.innerHTML = '';
@@ -1257,7 +1323,6 @@
             document.getElementById('deleteBoardModal').style.display = 'none';
         }
 
-        // Подтверждение удаления доски
         function confirmDeleteBoard() {
             const boardName = document.getElementById('boardToDelete').value;
             if (boardName) {
@@ -1272,7 +1337,6 @@
             }
         }
 
-        // Удаление доски
         function deleteBoard(boardName) {
             delete boards[boardName];
             
@@ -1285,38 +1349,15 @@
             renderGallery();
         }
 
-        // Загрузка изображений
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const files = document.getElementById('imageUpload').files;
-            
             if (files.length === 0) return;
 
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    if (!boards[currentBoard].images) {
-                        boards[currentBoard].images = [];
-                    }
-                    
-                    boards[currentBoard].images.push({
-                        src: event.target.result,
-                        name: file.name,
-                        date: new Date().toISOString(),
-                        id: Date.now() + Math.random() + file.name
-                    });
-                    
-                    saveToStorage();
-                    renderGallery();
-                };
-                reader.readAsDataURL(file);
-            });
-
-            document.getElementById('imageUpload').value = '';
+            await uploadMultipleToYandex(Array.from(files));
         });
 
-        // Отображение галереи
         function renderGallery() {
             const gallery = document.getElementById('gallery');
             const images = boards[currentBoard]?.images || [];
@@ -1333,7 +1374,7 @@
                 html += `
                     <div class="gallery-item ${deleteMode ? 'delete-mode' : ''}" data-id="${img.id}">
                         <div class="image-checkbox ${isSelected ? 'selected' : ''}" onclick="toggleImageSelection('${img.id}', event)"></div>
-                        <img src="${img.src}" alt="${img.name}" onclick="handleImageClick('${img.id}', '${img.src.replace(/'/g, "\\'")}')">
+                        <img src="${img.src}" alt="${img.name}" onclick="handleImageClick('${img.id}', '${img.src.replace(/'/g, "\\'")}')" loading="lazy">
                         <button class="delete-single-btn" onclick="confirmDeleteImage('${img.id}', event)">✕</button>
                     </div>
                 `;
@@ -1343,7 +1384,6 @@
             updateSelectionCounter();
         }
 
-        // Обработка клика по изображению
         function handleImageClick(imageId, imgSrc) {
             if (deleteMode) {
                 toggleImageSelection(imageId, event);
@@ -1352,7 +1392,6 @@
             }
         }
 
-        // Переключение выбора изображения
         function toggleImageSelection(imageId, event) {
             event.stopPropagation();
             event.preventDefault();
@@ -1373,7 +1412,6 @@
             updateSelectionCounter();
         }
 
-        // Выбрать все изображения
         function selectAllImages() {
             const images = boards[currentBoard]?.images || [];
             images.forEach(img => selectedImages.add(img.id));
@@ -1381,19 +1419,16 @@
             renderGallery();
         }
 
-        // Снять выбор со всех
         function deselectAllImages() {
             selectedImages.clear();
             updateSelectionCounter();
             renderGallery();
         }
 
-        // Обновление счетчика
         function updateSelectionCounter() {
             document.getElementById('selectionCounter').textContent = `Выбрано: ${selectedImages.size}`;
         }
 
-        // Подтверждение удаления одного изображения
         function confirmDeleteImage(imageId, event) {
             event.stopPropagation();
             event.preventDefault();
@@ -1405,7 +1440,6 @@
             );
         }
 
-        // Удаление одного изображения
         function deleteSingleImage(imageId) {
             const images = boards[currentBoard].images;
             const index = images.findIndex(img => img.id === imageId);
@@ -1423,7 +1457,6 @@
             }
         }
 
-        // Подтверждение удаления выбранных
         function confirmDeleteSelected() {
             if (selectedImages.size === 0) {
                 alert('Нет выбранных изображений');
@@ -1437,7 +1470,6 @@
             );
         }
 
-        // Удаление нескольких изображений
         function deleteSelectedImages() {
             const images = boards[currentBoard].images;
             boards[currentBoard].images = images.filter(img => !selectedImages.has(img.id));
@@ -1451,7 +1483,6 @@
             }
         }
 
-        // Показать диалог подтверждения
         function showConfirmDialog(title, message, onConfirm) {
             document.getElementById('confirmTitle').textContent = title;
             document.getElementById('confirmMessage').textContent = message;
@@ -1462,7 +1493,6 @@
             document.getElementById('confirmModal').style.display = 'flex';
         }
 
-        // Закрытие модальных окон
         function closeConfirmModal() {
             document.getElementById('confirmModal').style.display = 'none';
         }
@@ -1476,7 +1506,6 @@
             document.getElementById('imageModal').style.display = 'none';
         }
 
-        // Закрытие по Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeModal();
@@ -1492,7 +1521,10 @@
         });
 
         // Инициализация
-        init();
+        applyTheme();
+        applyGridSettingsFromStorage();
+        renderBoards();
+        renderGallery();
     </script>
 </body>
 </html>
