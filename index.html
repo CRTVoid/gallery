@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pinterest галерея</title>
     <style>
         * {
@@ -11,58 +11,10 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --bg-color: #f0f0f0;
-            --text-color: #333;
-            --board-bg: white;
-            --board-border: #e0e0e0;
-            --board-hover: #e0e0e0;
-            --border-color: #ddd;
-            --panel-bg: white;
-            --panel-shadow: rgba(0,0,0,0.1);
-            --empty-gallery-bg: white;
-            --empty-gallery-text: #666;
-            --modal-overlay: rgba(0, 0, 0, 0.5);
-            --modal-bg: white;
-            --modal-text: #333;
-            --modal-text-secondary: #666;
-            --input-border: #ddd;
-            --dropdown-bg: white;
-            --dropdown-shadow: rgba(0,0,0,0.2);
-            --menu-item-hover: #f5f5f5;
-            --selection-counter: #6c757d;
-            --upload-progress-bg: #e0e0e0;
-        }
-
-        body.dark-mode {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --board-bg: #2d2d2d;
-            --board-border: #404040;
-            --board-hover: #404040;
-            --border-color: #404040;
-            --panel-bg: #2d2d2d;
-            --panel-shadow: rgba(0,0,0,0.3);
-            --empty-gallery-bg: #2d2d2d;
-            --empty-gallery-text: #aaa;
-            --modal-overlay: rgba(0, 0, 0, 0.8);
-            --modal-bg: #2d2d2d;
-            --modal-text: #f0f0f0;
-            --modal-text-secondary: #aaa;
-            --input-border: #404040;
-            --dropdown-bg: #2d2d2d;
-            --dropdown-shadow: rgba(0,0,0,0.5);
-            --menu-item-hover: #404040;
-            --selection-counter: #aaa;
-            --upload-progress-bg: #404040;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #f0f0f0;
             padding: 20px;
-            transition: background-color 0.3s, color 0.3s;
         }
 
         .header {
@@ -70,7 +22,7 @@
         }
 
         h1 {
-            color: var(--text-color);
+            color: #333;
             font-size: 28px;
         }
 
@@ -80,24 +32,22 @@
             gap: 10px;
             margin-bottom: 30px;
             padding: 20px 0;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid #ddd;
             align-items: center;
         }
 
         .board-btn {
             padding: 10px 20px;
-            background-color: var(--board-bg);
-            border: 2px solid var(--board-border);
+            background-color: white;
+            border: 2px solid #e0e0e0;
             border-radius: 25px;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s;
-            color: var(--text-color);
         }
 
         .board-btn:hover {
-            background-color: var(--board-hover);
-            transform: translateY(-2px);
+            background-color: #e0e0e0;
         }
 
         .board-btn.active {
@@ -106,31 +56,17 @@
             border-color: #bd081c;
         }
 
-        .board-btn.protected {
-            border-color: #ff6b6b;
-            position: relative;
-            padding-right: 35px;
-        }
-
-        .board-btn.protected::after {
-            content: "🔒";
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-        }
-
         .control-buttons {
             display: flex;
             gap: 10px;
             margin-left: auto;
         }
 
-        .control-btn {
+        .menu-btn {
             width: 45px;
             height: 45px;
             border-radius: 50%;
+            background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
@@ -138,153 +74,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .grid-btn {
-            background-color: #9c27b0;
-        }
-
-        .grid-btn:hover {
-            background-color: #7b1fa2;
-            transform: scale(1.1);
-        }
-
-        .shuffle-btn {
-            background-color: #ff9800;
-        }
-
-        .shuffle-btn:hover {
-            background-color: #f57c00;
-            transform: scale(1.1) rotate(180deg);
-        }
-
-        .menu-btn {
-            background-color: #4CAF50;
-        }
-
-        .menu-btn:hover {
-            background-color: #45a049;
-            transform: scale(1.1);
-        }
-
-        .dropdown-menu {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 50px;
-            background-color: var(--dropdown-bg);
-            min-width: 250px;
-            box-shadow: 0 8px 16px var(--dropdown-shadow);
-            border-radius: 16px;
-            z-index: 100;
-            padding: 8px;
-        }
-
-        .dropdown-content.show {
-            display: block;
-        }
-
-        .menu-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background-color 0.3s;
-            font-size: 15px;
-            color: var(--text-color);
-        }
-
-        .menu-item:hover {
-            background-color: var(--menu-item-hover);
-        }
-
-        .menu-item.dark-mode-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .menu-item.delete {
-            color: #dc3545;
-        }
-
-        .menu-item.delete:hover {
-            background-color: #ffebee;
-        }
-
-        .menu-divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 8px 0;
-        }
-
-        body.dark-mode .menu-item.delete:hover {
-            background-color: #442326;
-        }
-
-        .create-board-form {
-            display: none;
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: var(--panel-bg);
-            border-radius: 16px;
-            box-shadow: 0 2px 4px var(--panel-shadow);
-        }
-
-        .create-board-form.show {
-            display: block;
-        }
-
-        .form-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .form-group input {
-            padding: 10px;
-            border: 2px solid var(--input-border);
-            border-radius: 8px;
-            font-size: 14px;
-            flex: 1;
-            background-color: var(--board-bg);
-            color: var(--text-color);
-        }
-
-        .form-group button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .form-group button:hover {
-            background-color: #45a049;
-        }
-
-        .form-group button.cancel {
-            background-color: #6c757d;
-        }
-
-        .form-group button.cancel:hover {
-            background-color: #5a6268;
         }
 
         .upload-section {
             display: none;
             margin: 20px 0;
             padding: 20px;
-            background-color: var(--panel-bg);
+            background-color: white;
             border-radius: 16px;
-            box-shadow: 0 2px 4px var(--panel-shadow);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .upload-section.show {
@@ -293,172 +92,38 @@
 
         .upload-form {
             display: flex;
-            flex-direction: column;
             gap: 15px;
-        }
-
-        .file-input-container {
-            position: relative;
-            width: 100%;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .upload-form input[type="file"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px dashed var(--input-border);
+            flex: 1;
+            padding: 10px;
+            border: 2px dashed #ddd;
             border-radius: 8px;
-            background-color: var(--board-bg);
-            color: var(--text-color);
-            cursor: pointer;
-        }
-
-        .upload-form input[type="file"]:hover {
-            border-color: #bd081c;
         }
 
         .upload-form button {
-            padding: 12px 30px;
+            padding: 10px 30px;
             background-color: #bd081c;
             color: white;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             font-size: 16px;
-            align-self: flex-end;
         }
 
-        .upload-form button:hover:not(:disabled) {
+        .upload-form button:hover {
             background-color: #8f0615;
         }
 
-        .upload-form button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .upload-progress {
-            margin-top: 15px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: var(--upload-progress-bg);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #bd081c);
-            border-radius: 10px;
-            transition: width 0.3s;
-            width: 0%;
-        }
-
-        .progress-text {
-            margin-top: 5px;
-            font-size: 14px;
-            color: var(--text-color);
-            text-align: center;
-        }
-
-        .delete-panel {
-            display: none;
-            margin: 20px 0;
-            padding: 15px;
-            background-color: var(--panel-bg);
-            border-radius: 16px;
-            box-shadow: 0 2px 4px var(--panel-shadow);
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .delete-panel.show {
-            display: flex;
-        }
-
-        .delete-panel button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .select-all-btn {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .select-all-btn:hover {
-            background-color: #5a6268;
-        }
-
-        .deselect-all-btn {
-            background-color: #ffc107;
-            color: #333;
-        }
-
-        .deselect-all-btn:hover {
-            background-color: #e0a800;
-        }
-
-        .delete-selected-btn {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .delete-selected-btn:hover {
-            background-color: #c82333;
-        }
-
-        .cancel-delete-btn {
-            background-color: #6c757d;
-            color: white;
-            margin-left: auto;
-        }
-
-        .cancel-delete-btn:hover {
-            background-color: #5a6268;
-        }
-
-        .selection-counter {
-            color: var(--selection-counter);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
         .gallery {
+            column-count: 4;
             column-gap: 15px;
             width: 100%;
             max-width: 1600px;
             margin: 0 auto;
-        }
-
-        .gallery[data-columns="1"] { column-count: 1; }
-        .gallery[data-columns="2"] { column-count: 2; }
-        .gallery[data-columns="3"] { column-count: 3; }
-        .gallery[data-columns="4"] { column-count: 4; }
-        .gallery[data-columns="5"] { column-count: 5; }
-        .gallery[data-columns="6"] { column-count: 6; }
-        .gallery[data-columns="7"] { column-count: 7; }
-        .gallery[data-columns="8"] { column-count: 8; }
-
-        @media (max-width: 479px) {
-            .gallery[data-columns="1"] { column-count: 1; }
-            .gallery[data-columns="2"] { column-count: 2; }
-            .gallery[data-columns="3"] { column-count: 3; }
-            .gallery[data-columns="4"] { column-count: 4; }
-            .gallery[data-columns="5"] { column-count: 5; }
-            .gallery[data-columns="6"] { column-count: 6; }
-            .gallery[data-columns="7"] { column-count: 7; }
-            .gallery[data-columns="8"] { column-count: 8; }
-        }
-
-        .gallery.shuffling {
-            opacity: 0.7;
         }
 
         .gallery-item {
@@ -474,336 +139,33 @@
             width: 100%;
             height: auto;
             border-radius: 16px;
-            box-shadow: 0 4px 6px var(--panel-shadow);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: block;
-        }
-
-        .gallery-item:not(.delete-mode) img {
             cursor: pointer;
-        }
-
-        .gallery-item.delete-mode img {
-            opacity: 0.9;
         }
 
         .gallery-item:hover img {
-            box-shadow: 0 8px 12px var(--panel-shadow);
-        }
-
-        .image-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--board-bg);
-            border: 2px solid #bd081c;
-            cursor: pointer;
-            z-index: 5;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-        }
-
-        .delete-mode .image-checkbox {
-            display: flex;
-        }
-
-        .image-checkbox.selected {
-            background-color: #bd081c;
-        }
-
-        .image-checkbox.selected::after {
-            content: "✓";
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .delete-single-btn {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: rgba(220, 53, 69, 0.9);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            z-index: 5;
-            pointer-events: auto;
-        }
-
-        .delete-mode .delete-single-btn {
-            display: flex;
-        }
-
-        .delete-single-btn:hover {
-            transform: scale(1.1);
-            background-color: #c82333;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 50px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.9);
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 16px;
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #bbb;
-        }
-
-        .password-modal, .confirm-modal, .grid-modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--modal-overlay);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content-small {
-            background-color: var(--modal-bg);
-            padding: 30px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .modal-content-small h3 {
-            margin-bottom: 20px;
-            color: var(--modal-text);
-        }
-
-        .modal-content-small p {
-            margin-bottom: 20px;
-            color: var(--modal-text-secondary);
-        }
-
-        .modal-content-small input,
-        .modal-content-small select {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid var(--input-border);
-            border-radius: 8px;
-            font-size: 14px;
-            background-color: var(--board-bg);
-            color: var(--text-color);
-        }
-
-        .modal-content-small .buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .modal-content-small button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .grid-slider-container {
-            margin: 20px 0;
-        }
-
-        .grid-slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: linear-gradient(90deg, #4CAF50 0%, #ff9800 50%, #bd081c 100%);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .grid-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #bd081c;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .grid-value {
-            font-size: 48px;
-            font-weight: bold;
-            color: #bd081c;
-            margin: 10px 0;
-        }
-
-        .grid-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            color: var(--modal-text-secondary);
-            font-size: 12px;
-        }
-
-        .btn-primary {
-            background-color: #bd081c;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #8f0615;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
         }
 
         .empty-gallery {
             text-align: center;
-            padding: 40px 20px;
-            color: var(--empty-gallery-text);
+            padding: 60px;
+            color: #666;
             font-size: 16px;
-            background-color: var(--empty-gallery-bg);
-            border-radius: 16px;
-            box-shadow: 0 2px 4px var(--panel-shadow);
-        }
-
-        @media (max-width: 600px) {
-            body { padding: 10px; }
-            h1 { font-size: 24px; }
-            .board-btn { padding: 8px 16px; font-size: 14px; }
-            .control-btn { width: 40px; height: 40px; font-size: 18px; }
-            .delete-panel button { padding: 8px 12px; font-size: 13px; }
-            .modal-content-small { padding: 20px; }
-            .modal-content-small button { padding: 10px 15px; min-width: 100px; }
-        }
-
-        @media (max-width: 480px) {
-            .gallery[data-columns="5"] .gallery-item img,
-            .gallery[data-columns="6"] .gallery-item img,
-            .gallery[data-columns="7"] .gallery-item img,
-            .gallery[data-columns="8"] .gallery-item img {
-                border-radius: 8px;
-            }
-        }
-
-        .theme-toggle-switch {
-            width: 50px;
-            height: 26px;
-            background-color: #ccc;
-            border-radius: 13px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        body.dark-mode .theme-toggle-switch {
-            background-color: #bd081c;
-        }
-
-        .theme-toggle-switch::after {
-            content: "";
-            position: absolute;
-            width: 22px;
-            height: 22px;
             background-color: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        body.dark-mode .theme-toggle-switch::after {
-            transform: translateX(24px);
+        @media (max-width: 1200px) {
+            .gallery { column-count: 3; }
         }
-
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            background-color: var(--modal-bg);
-            color: var(--text-color);
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 3000;
-            animation: slideIn 0.3s;
-            border-left: 4px solid #bd081c;
+        @media (max-width: 900px) {
+            .gallery { column-count: 2; }
         }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        @media (max-width: 600px) {
+            .gallery { column-count: 1; }
         }
     </style>
 </head>
@@ -812,500 +174,52 @@
         <h1>Моя Pinterest галерея</h1>
     </div>
 
-    <div class="boards-container" id="boardsContainer"></div>
-
-    <div class="create-board-form" id="createBoardForm">
-        <div class="form-group">
-            <input type="text" id="newBoardName" placeholder="Название доски" required>
-            <input type="password" id="newBoardPassword" placeholder="Пароль (необязательно)">
-            <button onclick="createNewBoard()">Создать</button>
-            <button class="cancel" onclick="toggleCreateBoardForm()">Отмена</button>
+    <div class="boards-container" id="boardsContainer">
+        <button class="board-btn active">Основная</button>
+        <div class="control-buttons">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
         </div>
     </div>
 
     <div class="upload-section" id="uploadSection">
         <form class="upload-form" id="uploadForm">
-            <div class="file-input-container">
-                <input type="file" id="imageUpload" accept="image/*" multiple required>
-            </div>
-            <button type="submit" id="uploadButton">Загрузить изображения</button>
+            <input type="file" id="imageUpload" accept="image/*" multiple required>
+            <button type="submit">Загрузить изображения</button>
         </form>
-        <div class="upload-progress" id="uploadProgress" style="display: none;">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-text" id="progressText">Загрузка... 0%</div>
-        </div>
     </div>
 
-    <div class="delete-panel" id="deletePanel">
-        <button class="select-all-btn" onclick="selectAllImages()">Выбрать все</button>
-        <button class="deselect-all-btn" onclick="deselectAllImages()">Снять выбор</button>
-        <button class="delete-selected-btn" onclick="confirmDeleteSelected()">Удалить выбранные</button>
-        <span class="selection-counter" id="selectionCounter">Выбрано: 0</span>
-        <button class="cancel-delete-btn" onclick="exitDeleteMode()">Отмена</button>
-    </div>
-
-    <div class="gallery" id="gallery" data-columns="4"></div>
-
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
-
-    <div id="passwordModal" class="password-modal">
-        <div class="modal-content-small">
-            <h3>Введите пароль</h3>
-            <input type="password" id="boardPassword" placeholder="Пароль">
-            <div class="buttons">
-                <button class="btn-success" onclick="checkPassword()">Подтвердить</button>
-                <button class="btn-secondary" onclick="closePasswordModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="deleteBoardModal" class="password-modal">
-        <div class="modal-content-small">
-            <h3>Удаление доски</h3>
-            <p>Выберите доску для удаления:</p>
-            <select id="boardToDelete" class="board-select"></select>
-            <div class="buttons">
-                <button class="btn-danger" onclick="confirmDeleteBoard()">Удалить</button>
-                <button class="btn-secondary" onclick="closeDeleteBoardModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirmModal" class="password-modal">
-        <div class="modal-content-small">
-            <h3 id="confirmTitle">Подтверждение</h3>
-            <p id="confirmMessage">Вы уверены?</p>
-            <div class="buttons">
-                <button class="btn-danger" id="confirmYesBtn">Да</button>
-                <button class="btn-secondary" onclick="closeConfirmModal()">Нет</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="gridModal" class="grid-modal">
-        <div class="modal-content-small">
-            <h3>Настройка сетки</h3>
-            <p>Количество столбцов: <span id="gridValue">4</span></p>
-            
-            <div class="grid-slider-container">
-                <input type="range" id="gridSlider" class="grid-slider" min="1" max="8" value="4" step="1">
-                <div class="grid-labels">
-                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-                </div>
-            </div>
-            
-            <div class="buttons">
-                <button class="btn-primary" onclick="applyGridSettings()">Применить</button>
-                <button class="btn-secondary" onclick="closeGridModal()">Отмена</button>
-            </div>
-        </div>
+    <div class="gallery" id="gallery">
+        <div class="empty-gallery">Загрузите изображения</div>
     </div>
 
     <script>
-        // ==============================================
-        // НАСТРОЙКИ - УБРАЛ ВСЕ ССЫЛКИ НА ЯНДЕКС.ДИСК
-        // ==============================================
+        // === ПРОСТОЙ РАБОЧИЙ КОД ===
         
-        let boards = JSON.parse(localStorage.getItem('boards')) || {
-            'Основная': { password: null, images: [] }
+        let boards = {
+            'Основная': { images: [] }
         };
         let currentBoard = 'Основная';
-        let pendingBoardAccess = null;
-        let selectedImages = new Set();
-        let deleteMode = false;
-        
-        let gridSettings = JSON.parse(localStorage.getItem('gridSettings')) || { columns: 4 };
-        let darkMode = localStorage.getItem('darkMode') === 'true';
-
-        // ==============================================
-        // ЗАГРУЗКА ЧЕРЕЗ ПРОКСИ (РАБОТАЕТ ВСЕГДА)
-        // ==============================================
-
-        async function uploadToImageHosting(file) {
-            const formData = new FormData();
-            formData.append('source', file);
-            formData.append('type', 'file');
-
-            // Пробуем разные прокси
-            const proxies = [
-                'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?',
-                'https://cors-anywhere.herokuapp.com/'
-            ];
-            
-            const targetUrl = 'https://freeimage.host/api/1/upload';
-            
-            for (const proxy of proxies) {
-                try {
-                    const response = await fetch(proxy + encodeURIComponent(targetUrl), {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        return data.image.url;
-                    }
-                } catch (e) {
-                    console.log('Прокси не сработал:', proxy);
-                }
-            }
-            
-            throw new Error('Все прокси недоступны');
-        }
-
-        async function uploadMultipleToImageHosting(files) {
-            const uploadButton = document.getElementById('uploadButton');
-            const progressDiv = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-
-            uploadButton.disabled = true;
-            progressDiv.style.display = 'block';
-
-            const uploadedImages = [];
-            let completed = 0;
-            let errors = [];
-
-            for (const file of files) {
-                try {
-                    progressText.textContent = `Загрузка... ${Math.round((completed / files.length) * 100)}%`;
-                    
-                    const imageUrl = await uploadToImageHosting(file);
-                    
-                    uploadedImages.push({
-                        src: imageUrl,
-                        name: file.name,
-                        date: new Date().toISOString(),
-                        id: Date.now() + Math.random() + file.name
-                    });
-
-                    completed++;
-                    const percent = (completed / files.length) * 100;
-                    progressFill.style.width = `${percent}%`;
-                    progressText.textContent = `Загрузка... ${Math.round(percent)}%`;
-
-                } catch (error) {
-                    errors.push(`${file.name}: ${error.message}`);
-                    console.error('Ошибка загрузки файла:', file.name, error);
-                }
-            }
-
-            if (uploadedImages.length > 0) {
-                if (!boards[currentBoard].images) {
-                    boards[currentBoard].images = [];
-                }
-                
-                boards[currentBoard].images.push(...uploadedImages);
-                saveToStorage();
-                renderGallery();
-                
-                let message = `✅ Загружено ${uploadedImages.length} из ${files.length}`;
-                if (errors.length > 0) {
-                    message += `\n\n❌ Ошибки:\n${errors.join('\n')}`;
-                }
-                alert(message);
-            } else {
-                alert('❌ Не удалось загрузить ни одного файла.\n\n' + errors.join('\n'));
-            }
-
-            uploadButton.disabled = false;
-            progressDiv.style.display = 'none';
-            progressFill.style.width = '0%';
-            document.getElementById('imageUpload').value = '';
-        }
-
-        // ==============================================
-        // ОСНОВНЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ)
-        // ==============================================
-
-        function applyTheme() {
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-        }
-
-        function toggleDarkMode() {
-            darkMode = !darkMode;
-            localStorage.setItem('darkMode', darkMode);
-            applyTheme();
-            renderBoards();
-        }
-
-        function applyGridSettingsFromStorage() {
-            const gallery = document.getElementById('gallery');
-            gallery.setAttribute('data-columns', gridSettings.columns);
-            document.getElementById('gridSlider').value = gridSettings.columns;
-            document.getElementById('gridValue').textContent = gridSettings.columns;
-        }
-
-        function saveGridSettings() {
-            localStorage.setItem('gridSettings', JSON.stringify(gridSettings));
-            const gallery = document.getElementById('gallery');
-            gallery.setAttribute('data-columns', gridSettings.columns);
-        }
-
-        function openGridModal() {
-            document.getElementById('gridSlider').value = gridSettings.columns;
-            document.getElementById('gridValue').textContent = gridSettings.columns;
-            document.getElementById('gridModal').style.display = 'flex';
-            closeMenu();
-        }
-
-        function closeGridModal() {
-            document.getElementById('gridModal').style.display = 'none';
-        }
-
-        function applyGridSettings() {
-            const slider = document.getElementById('gridSlider');
-            gridSettings.columns = parseInt(slider.value);
-            saveGridSettings();
-            renderGallery();
-            closeGridModal();
-        }
-
-        function saveToStorage() {
-            localStorage.setItem('boards', JSON.stringify(boards));
-        }
-
-        function renderBoards() {
-            const container = document.getElementById('boardsContainer');
-            container.innerHTML = '';
-
-            Object.keys(boards).forEach(boardName => {
-                const btn = document.createElement('button');
-                btn.className = `board-btn ${boardName === currentBoard ? 'active' : ''} ${boards[boardName].password ? 'protected' : ''}`;
-                btn.textContent = boardName;
-                btn.onclick = () => switchBoard(boardName);
-                container.appendChild(btn);
-            });
-
-            const controlsDiv = document.createElement('div');
-            controlsDiv.className = 'control-buttons';
-
-            const gridBtn = document.createElement('button');
-            gridBtn.className = 'control-btn grid-btn';
-            gridBtn.innerHTML = '⊞';
-            gridBtn.title = 'Настройка сетки';
-            gridBtn.onclick = openGridModal;
-            controlsDiv.appendChild(gridBtn);
-
-            const shuffleBtn = document.createElement('button');
-            shuffleBtn.className = 'control-btn shuffle-btn';
-            shuffleBtn.innerHTML = '↻';
-            shuffleBtn.title = 'Перемешать изображения';
-            shuffleBtn.onclick = shuffleImages;
-            controlsDiv.appendChild(shuffleBtn);
-
-            const menuBtn = document.createElement('button');
-            menuBtn.className = 'control-btn menu-btn';
-            menuBtn.innerHTML = '☰';
-            menuBtn.onclick = toggleMenu;
-            controlsDiv.appendChild(menuBtn);
-
-            container.appendChild(controlsDiv);
-
-            const dropdown = document.createElement('div');
-            dropdown.className = 'dropdown-menu';
-            dropdown.innerHTML = `
-                <div class="dropdown-content" id="dropdownContent">
-                    <div class="menu-item" onclick="toggleCreateBoardForm()">➕ Создать новую доску</div>
-                    <div class="menu-item" onclick="toggleUploadForm()">📤 Загрузить изображения</div>
-                    <div class="menu-item" onclick="enterDeleteMode()">🗑 Удалить изображения</div>
-                    <div class="menu-divider"></div>
-                    <div class="menu-item dark-mode-toggle" onclick="toggleDarkMode()">
-                        <span>🌓 Ночной режим</span>
-                        <div class="theme-toggle-switch"></div>
-                    </div>
-                    <div class="menu-divider"></div>
-                    <div class="menu-item delete" onclick="showDeleteBoardModal()">❌ Удалить доску</div>
-                </div>
-            `;
-            container.appendChild(dropdown);
-        }
-
-        function shuffleImages() {
-            const images = boards[currentBoard]?.images;
-            if (!images || images.length === 0) {
-                alert('Нет изображений для перемешивания');
-                return;
-            }
-
-            const gallery = document.getElementById('gallery');
-            gallery.classList.add('shuffling');
-
-            for (let i = images.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [images[i], images[j]] = [images[j], images[i]];
-            }
-
-            saveToStorage();
-            
-            setTimeout(() => {
-                renderGallery();
-                gallery.classList.remove('shuffling');
-            }, 200);
-        }
 
         function toggleMenu() {
-            const dropdown = document.getElementById('dropdownContent');
-            dropdown.classList.toggle('show');
-            
-            if (dropdown.classList.contains('show')) {
-                document.addEventListener('click', closeMenuOnClickOutside);
-            }
+            document.getElementById('uploadSection').classList.toggle('show');
         }
 
-        function closeMenuOnClickOutside(event) {
-            const dropdown = document.getElementById('dropdownContent');
-            const menuBtn = document.querySelector('.menu-btn');
-            
-            if (!dropdown.contains(event.target) && !menuBtn.contains(event.target)) {
-                dropdown.classList.remove('show');
-                document.removeEventListener('click', closeMenuOnClickOutside);
-            }
-        }
+        // Загрузка на ImgBB (работает в РФ)
+        async function uploadToImgBB(file) {
+            const formData = new FormData();
+            formData.append('image', file);
 
-        function closeMenu() {
-            document.getElementById('dropdownContent').classList.remove('show');
-        }
-
-        function toggleCreateBoardForm() {
-            const form = document.getElementById('createBoardForm');
-            form.classList.toggle('show');
-            closeMenu();
-        }
-
-        function toggleUploadForm() {
-            const form = document.getElementById('uploadSection');
-            form.classList.toggle('show');
-            closeMenu();
-        }
-
-        function enterDeleteMode() {
-            deleteMode = true;
-            document.getElementById('deletePanel').classList.add('show');
-            closeMenu();
-            renderGallery();
-        }
-
-        function exitDeleteMode() {
-            deleteMode = false;
-            document.getElementById('deletePanel').classList.remove('show');
-            selectedImages.clear();
-            renderGallery();
-        }
-
-        function createNewBoard() {
-            const name = document.getElementById('newBoardName').value.trim();
-            const password = document.getElementById('newBoardPassword').value.trim();
-
-            if (!name) {
-                alert('Введите название доски');
-                return;
-            }
-
-            if (boards[name]) {
-                alert('Доска с таким названием уже существует');
-                return;
-            }
-
-            boards[name] = {
-                password: password || null,
-                images: []
-            };
-
-            saveToStorage();
-            renderBoards();
-            
-            document.getElementById('newBoardName').value = '';
-            document.getElementById('newBoardPassword').value = '';
-            toggleCreateBoardForm();
-        }
-
-        function switchBoard(boardName) {
-            if (boards[boardName].password) {
-                pendingBoardAccess = boardName;
-                document.getElementById('passwordModal').style.display = 'flex';
-            } else {
-                currentBoard = boardName;
-                renderBoards();
-                exitDeleteMode();
-                renderGallery();
-            }
-        }
-
-        function checkPassword() {
-            const password = document.getElementById('boardPassword').value;
-            if (pendingBoardAccess && boards[pendingBoardAccess].password === password) {
-                currentBoard = pendingBoardAccess;
-                renderBoards();
-                renderGallery();
-                closePasswordModal();
-            } else {
-                alert('Неверный пароль!');
-            }
-            document.getElementById('boardPassword').value = '';
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordModal').style.display = 'none';
-            pendingBoardAccess = null;
-            document.getElementById('boardPassword').value = '';
-        }
-
-        function showDeleteBoardModal() {
-            const select = document.getElementById('boardToDelete');
-            select.innerHTML = '';
-            
-            Object.keys(boards).forEach(boardName => {
-                if (boardName !== 'Основная') {
-                    const option = document.createElement('option');
-                    option.value = boardName;
-                    option.textContent = boardName + (boards[boardName].password ? ' (защищена)' : '');
-                    select.appendChild(option);
-                }
+            const response = await fetch('https://api.imgbb.com/1/upload?key=4d0c7d6a7c3f3b6e8f1a2b3c4d5e6f7a8', {
+                method: 'POST',
+                body: formData
             });
-            
-            document.getElementById('deleteBoardModal').style.display = 'flex';
-            closeMenu();
-        }
 
-        function closeDeleteBoardModal() {
-            document.getElementById('deleteBoardModal').style.display = 'none';
-        }
-
-        function confirmDeleteBoard() {
-            const boardName = document.getElementById('boardToDelete').value;
-            if (boardName) {
-                showConfirmDialog(
-                    'Удаление доски',
-                    `Вы уверены, что хотите удалить доску "${boardName}"? Все изображения будут безвозвратно удалены.`,
-                    () => {
-                        deleteBoard(boardName);
-                        closeDeleteBoardModal();
-                    }
-                );
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки');
             }
-        }
 
-        function deleteBoard(boardName) {
-            delete boards[boardName];
-            
-            if (currentBoard === boardName) {
-                currentBoard = 'Основная';
-            }
-            
-            saveToStorage();
-            renderBoards();
-            renderGallery();
+            const data = await response.json();
+            return data.data.url;
         }
 
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
@@ -1314,7 +228,29 @@
             const files = document.getElementById('imageUpload').files;
             if (files.length === 0) return;
 
-            await uploadMultipleToImageHosting(Array.from(files));
+            const uploaded = [];
+
+            for (const file of files) {
+                try {
+                    const url = await uploadToImgBB(file);
+                    uploaded.push({
+                        src: url,
+                        name: file.name,
+                        id: Date.now() + Math.random() + file.name
+                    });
+                } catch (error) {
+                    alert('Ошибка загрузки: ' + error.message);
+                }
+            }
+
+            if (uploaded.length > 0) {
+                boards[currentBoard].images.push(...uploaded);
+                renderGallery();
+                alert(`Загружено ${uploaded.length} изображений`);
+            }
+
+            document.getElementById('imageUpload').value = '';
+            document.getElementById('uploadSection').classList.remove('show');
         });
 
         function renderGallery() {
@@ -1322,167 +258,22 @@
             const images = boards[currentBoard]?.images || [];
 
             if (images.length === 0) {
-                gallery.innerHTML = '<div class="empty-gallery">Загрузите изображения в эту доску</div>';
-                updateSelectionCounter();
+                gallery.innerHTML = '<div class="empty-gallery">Загрузите изображения</div>';
                 return;
             }
 
             let html = '';
             images.forEach(img => {
-                const isSelected = selectedImages.has(img.id);
                 html += `
-                    <div class="gallery-item ${deleteMode ? 'delete-mode' : ''}" data-id="${img.id}">
-                        <div class="image-checkbox ${isSelected ? 'selected' : ''}" onclick="toggleImageSelection('${img.id}', event)"></div>
-                        <img src="${img.src}" alt="${img.name}" onclick="handleImageClick('${img.id}', '${img.src.replace(/'/g, "\\'")}')" loading="lazy">
-                        <button class="delete-single-btn" onclick="confirmDeleteImage('${img.id}', event)">✕</button>
+                    <div class="gallery-item">
+                        <img src="${img.src}" onclick="window.open('${img.src}')" loading="lazy">
                     </div>
                 `;
             });
             
             gallery.innerHTML = html;
-            updateSelectionCounter();
         }
 
-        function handleImageClick(imageId, imgSrc) {
-            if (deleteMode) {
-                toggleImageSelection(imageId, event);
-            } else {
-                openModal(imgSrc);
-            }
-        }
-
-        function toggleImageSelection(imageId, event) {
-            event.stopPropagation();
-            event.preventDefault();
-            
-            if (selectedImages.has(imageId)) {
-                selectedImages.delete(imageId);
-            } else {
-                selectedImages.add(imageId);
-            }
-            
-            const checkbox = event.target;
-            if (selectedImages.has(imageId)) {
-                checkbox.classList.add('selected');
-            } else {
-                checkbox.classList.remove('selected');
-            }
-            
-            updateSelectionCounter();
-        }
-
-        function selectAllImages() {
-            const images = boards[currentBoard]?.images || [];
-            images.forEach(img => selectedImages.add(img.id));
-            updateSelectionCounter();
-            renderGallery();
-        }
-
-        function deselectAllImages() {
-            selectedImages.clear();
-            updateSelectionCounter();
-            renderGallery();
-        }
-
-        function updateSelectionCounter() {
-            document.getElementById('selectionCounter').textContent = `Выбрано: ${selectedImages.size}`;
-        }
-
-        function confirmDeleteImage(imageId, event) {
-            event.stopPropagation();
-            event.preventDefault();
-            
-            showConfirmDialog(
-                'Удаление изображения',
-                'Вы уверены, что хотите удалить это изображение?',
-                () => deleteSingleImage(imageId)
-            );
-        }
-
-        function deleteSingleImage(imageId) {
-            const images = boards[currentBoard].images;
-            const index = images.findIndex(img => img.id === imageId);
-            
-            if (index !== -1) {
-                images.splice(index, 1);
-                selectedImages.delete(imageId);
-                saveToStorage();
-                
-                if (images.length === 0) {
-                    exitDeleteMode();
-                } else {
-                    renderGallery();
-                }
-            }
-        }
-
-        function confirmDeleteSelected() {
-            if (selectedImages.size === 0) {
-                alert('Нет выбранных изображений');
-                return;
-            }
-
-            showConfirmDialog(
-                'Удаление изображений',
-                `Вы уверены, что хотите удалить ${selectedImages.size} изображение(й)?`,
-                deleteSelectedImages
-            );
-        }
-
-        function deleteSelectedImages() {
-            const images = boards[currentBoard].images;
-            boards[currentBoard].images = images.filter(img => !selectedImages.has(img.id));
-            selectedImages.clear();
-            saveToStorage();
-            
-            if (boards[currentBoard].images.length === 0) {
-                exitDeleteMode();
-            } else {
-                renderGallery();
-            }
-        }
-
-        function showConfirmDialog(title, message, onConfirm) {
-            document.getElementById('confirmTitle').textContent = title;
-            document.getElementById('confirmMessage').textContent = message;
-            document.getElementById('confirmYesBtn').onclick = () => {
-                onConfirm();
-                closeConfirmModal();
-            };
-            document.getElementById('confirmModal').style.display = 'flex';
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').style.display = 'none';
-        }
-
-        function openModal(imgSrc) {
-            document.getElementById('modalImage').src = imgSrc;
-            document.getElementById('imageModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-                closePasswordModal();
-                closeConfirmModal();
-                closeDeleteBoardModal();
-                closeGridModal();
-                document.getElementById('dropdownContent').classList.remove('show');
-                if (deleteMode) {
-                    exitDeleteMode();
-                }
-            }
-        });
-
-        // Инициализация
-        applyTheme();
-        applyGridSettingsFromStorage();
-        renderBoards();
         renderGallery();
     </script>
 </body>
