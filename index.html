@@ -911,8 +911,8 @@
         // ВАШ ТОКЕН И НАСТРОЙКИ
         // ==============================================
         const YANDEX_CONFIG = {
-            token: 'y0__xDgvdT3ARjHvD4gvvb5zhYu5mVVce8DtDhJj1_lg-nhuOrWxw',  // Ваш токен
-            folder: 'gallery'  // Папка на Диске
+            token: 'y0__xDgvdT3ARjHvD4gvvb5zhYu5mVVce8DtDhJj1_lg-nhuOrWxw',
+            folder: 'gallery'
         };
 
         // Состояние приложения
@@ -926,10 +926,9 @@
         let darkMode = localStorage.getItem('darkMode') === 'true';
 
         // ==============================================
-        // СИНХРОНИЗАЦИЯ ДОСОК ЧЕРЕЗ ЯНДЕКС.ДИСК
+        // РАБОТА С ЯНДЕКС.ДИСКОМ
         // ==============================================
 
-        // Загрузить структуру досок с Яндекс.Диска
         async function loadBoardsFromDisk() {
             try {
                 const filePath = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/boards.json`);
@@ -944,7 +943,7 @@
                 );
                 
                 if (response.status === 404) {
-                    console.log('boards.json не найден, создаём новый');
+                    console.log('boards.json не найден');
                     return null;
                 }
                 
@@ -964,10 +963,8 @@
             }
         }
 
-        // Сохранить структуру досок на Яндекс.Диск
         async function saveBoardsToDisk() {
             try {
-                // Сначала убедимся, что папка gallery существует
                 await ensureFolderExists();
                 
                 const boardsToSave = {};
@@ -999,12 +996,12 @@
                 );
                 
                 if (!uploadUrlResponse.ok) {
-                    throw new Error('Не удалось получить URL для загрузки boards.json');
+                    throw new Error('Не удалось получить URL для загрузки');
                 }
                 
                 const { href } = await uploadUrlResponse.json();
                 
-                const uploadResponse = await fetch(href, {
+                await fetch(href, {
                     method: 'PUT',
                     body: blob,
                     headers: {
@@ -1012,18 +1009,13 @@
                     }
                 });
                 
-                if (!uploadResponse.ok) {
-                    throw new Error('Ошибка загрузки boards.json');
-                }
-                
-                console.log('✅ Доски сохранены на Яндекс.Диск');
+                console.log('✅ Доски сохранены');
                 
             } catch (error) {
-                console.error('❌ Ошибка сохранения досок:', error);
+                console.error('❌ Ошибка сохранения:', error);
             }
         }
 
-        // Проверка и создание папки gallery
         async function ensureFolderExists() {
             const folderPath = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}`);
             
@@ -1038,7 +1030,7 @@
                 );
                 
                 if (checkResponse.status === 404) {
-                    const createResponse = await fetch(
+                    await fetch(
                         `https://cloud-api.yandex.net/v1/disk/resources?path=${folderPath}`,
                         {
                             method: 'PUT',
@@ -1047,19 +1039,14 @@
                             }
                         }
                     );
-                    
-                    if (!createResponse.ok) {
-                        throw new Error('Не удалось создать папку gallery');
-                    }
-                    console.log('Папка gallery создана');
+                    console.log('Папка создана');
                 }
             } catch (error) {
-                console.error('Ошибка при работе с папкой:', error);
+                console.error('Ошибка:', error);
                 throw error;
             }
         }
 
-        // Создание папки для доски
         async function ensureBoardFolder(boardName) {
             const boardFolderPath = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/${boardName}`);
             
@@ -1074,7 +1061,7 @@
                 );
                 
                 if (checkResponse.status === 404) {
-                    const createResponse = await fetch(
+                    await fetch(
                         `https://cloud-api.yandex.net/v1/disk/resources?path=${boardFolderPath}`,
                         {
                             method: 'PUT',
@@ -1083,110 +1070,136 @@
                             }
                         }
                     );
-                    
-                    if (!createResponse.ok) {
-                        throw new Error(`Не удалось создать папку доски ${boardName}`);
-                    }
-                    console.log(`Папка для доски "${boardName}" создана`);
                 }
             } catch (error) {
-                console.error('Ошибка при создании папки доски:', error);
+                console.error('Ошибка:', error);
                 throw error;
             }
         }
 
         // ==============================================
-        // ИСПРАВЛЕННАЯ ЗАГРУЗКА НА ЯНДЕКС.ДИСК
+        // ЗАГРУЗКА ИЗОБРАЖЕНИЙ
         // ==============================================
 
         async function uploadToYandexDisk(file, boardName) {
-    try {
-        // Создаём папку для доски
-        await ensureBoardFolder(boardName);
-        
-        const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const fileName = `${Date.now()}-${cleanFileName}`;
-        const path = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/${boardName}/${fileName}`);
-        
-        // Получаем URL для загрузки
-        const uploadUrlResponse = await fetch(
-            `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${path}&overwrite=true`,
-            {
-                headers: {
-                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+            try {
+                await ensureBoardFolder(boardName);
+                
+                const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const fileName = `${Date.now()}-${cleanFileName}`;
+                const path = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/${boardName}/${fileName}`);
+                
+                // Получаем URL для загрузки
+                const uploadUrlResponse = await fetch(
+                    `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${path}&overwrite=true`,
+                    {
+                        headers: {
+                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                        }
+                    }
+                );
+                
+                if (!uploadUrlResponse.ok) {
+                    throw new Error('Не удалось получить URL для загрузки');
                 }
+                
+                const { href } = await uploadUrlResponse.json();
+                
+                // Загружаем файл
+                const uploadResponse = await fetch(href, {
+                    method: 'PUT',
+                    body: file
+                });
+                
+                if (!uploadResponse.ok) {
+                    throw new Error('Ошибка при загрузке файла');
+                }
+                
+                // Делаем файл публичным
+                await fetch(
+                    `https://cloud-api.yandex.net/v1/disk/resources/publish?path=${path}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                        }
+                    }
+                );
+                
+                // Получаем ссылку на скачивание
+                const downloadResponse = await fetch(
+                    `https://cloud-api.yandex.net/v1/disk/resources/download?path=${path}`,
+                    {
+                        headers: {
+                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                        }
+                    }
+                );
+                
+                const downloadData = await downloadResponse.json();
+                
+                return downloadData.href; // Временная прямая ссылка
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                throw error;
             }
-        );
-        
-        if (!uploadUrlResponse.ok) {
-            const error = await uploadUrlResponse.json();
-            throw new Error(error.message || 'Не удалось получить URL для загрузки');
         }
-        
-        const { href } = await uploadUrlResponse.json();
-        
-        // Загружаем файл
-        const uploadResponse = await fetch(href, {
-            method: 'PUT',
-            body: file,
-            headers: {
-                'Content-Type': file.type
+
+        async function uploadMultipleToYandex(files) {
+            const uploadButton = document.getElementById('uploadButton');
+            const progressDiv = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            uploadButton.disabled = true;
+            progressDiv.style.display = 'block';
+
+            const uploadedImages = [];
+            let completed = 0;
+
+            for (const file of files) {
+                try {
+                    progressText.textContent = `Загрузка... ${Math.round((completed / files.length) * 100)}%`;
+                    
+                    const imageUrl = await uploadToYandexDisk(file, currentBoard);
+                    
+                    uploadedImages.push({
+                        src: imageUrl,
+                        name: file.name,
+                        date: new Date().toISOString(),
+                        id: Date.now() + Math.random() + file.name
+                    });
+
+                    completed++;
+                    const percent = (completed / files.length) * 100;
+                    progressFill.style.width = `${percent}%`;
+                    progressText.textContent = `Загрузка... ${Math.round(percent)}%`;
+
+                } catch (error) {
+                    console.error('Ошибка:', file.name, error);
+                }
             }
-        });
-        
-        if (!uploadResponse.ok) {
-            throw new Error(`Ошибка при загрузке файла: ${uploadResponse.status}`);
+
+            if (uploadedImages.length > 0) {
+                if (!boards[currentBoard].images) {
+                    boards[currentBoard].images = [];
+                }
+                
+                boards[currentBoard].images.push(...uploadedImages);
+                await saveBoardsToDisk();
+                saveToStorage();
+                renderGallery();
+                
+                alert(`✅ Загружено ${uploadedImages.length} из ${files.length}`);
+            }
+
+            uploadButton.disabled = false;
+            progressDiv.style.display = 'none';
+            progressFill.style.width = '0%';
+            document.getElementById('imageUpload').value = '';
         }
-        
-        // Делаем файл публичным
-        const publishResponse = await fetch(
-            `https://cloud-api.yandex.net/v1/disk/resources/publish?path=${path}`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
-                }
-            }
-        );
-        
-        if (!publishResponse.ok) {
-            throw new Error('Не удалось опубликовать файл');
-        }
-        
-        // Получаем публичную ссылку
-        const metaResponse = await fetch(
-            `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
-            {
-                headers: {
-                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
-                }
-            }
-        );
-        
-        const meta = await metaResponse.json();
-        const publicUrl = meta.public_url;
-        
-        // ИСПРАВЛЕНИЕ: получаем реальную ссылку на скачивание
-        const downloadUrlResponse = await fetch(
-            `https://cloud-api.yandex.net/v1/disk/resources/download?path=${path}`,
-            {
-                headers: {
-                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
-                }
-            }
-        );
-        
-        const downloadData = await downloadUrlResponse.json();
-        const directUrl = downloadData.href; // Это временная ссылка на скачивание
-        
-        console.log('✅ Файл загружен, временная ссылка:', directUrl);
-        return directUrl;
-        
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-        throw error;
-    }
-}
+
         // ==============================================
         // ОСНОВНЫЕ ФУНКЦИИ
         // ==============================================
@@ -1384,7 +1397,6 @@
                 return;
             }
 
-            // Создаём папку для новой доски на Яндекс.Диске
             try {
                 await ensureBoardFolder(name);
             } catch (error) {
@@ -1397,8 +1409,8 @@
                 images: []
             };
 
-            await saveBoardsToDisk();  // Сохраняем на Диск
-            saveToStorage();            // Сохраняем в localStorage
+            await saveBoardsToDisk();
+            saveToStorage();
             renderBoards();
             
             document.getElementById('newBoardName').value = '';
@@ -1479,7 +1491,7 @@
                 currentBoard = 'Основная';
             }
             
-            await saveBoardsToDisk();  // Сохраняем изменения на Диск
+            await saveBoardsToDisk();
             saveToStorage();
             renderBoards();
             renderGallery();
@@ -1583,7 +1595,7 @@
             if (index !== -1) {
                 images.splice(index, 1);
                 selectedImages.delete(imageId);
-                await saveBoardsToDisk();  // Сохраняем на Диск
+                await saveBoardsToDisk();
                 saveToStorage();
                 
                 if (images.length === 0) {
@@ -1611,7 +1623,7 @@
             const images = boards[currentBoard].images;
             boards[currentBoard].images = images.filter(img => !selectedImages.has(img.id));
             selectedImages.clear();
-            await saveBoardsToDisk();  // Сохраняем на Диск
+            await saveBoardsToDisk();
             saveToStorage();
             
             if (boards[currentBoard].images.length === 0) {
@@ -1659,34 +1671,29 @@
         });
 
         // ==============================================
-        // ИНИЦИАЛИЗАЦИЯ
+        // ЗАПУСК
         // ==============================================
         async function initApp() {
             applyTheme();
             applyGridSettingsFromStorage();
             
-            // Загружаем доски с Яндекс.Диска
             const boardsFromDisk = await loadBoardsFromDisk();
             
             if (boardsFromDisk) {
                 boards = boardsFromDisk;
                 console.log('✅ Доски загружены с Яндекс.Диска');
             } else {
-                // Если нет файла, создаём начальную структуру
                 boards = {
                     'Основная': { password: null, images: [] }
                 };
                 await saveBoardsToDisk();
             }
             
-            // Загружаем в localStorage как кэш
             saveToStorage();
-            
             renderBoards();
             renderGallery();
         }
 
-        // Запускаем приложение
         initApp();
     </script>
 </body>
