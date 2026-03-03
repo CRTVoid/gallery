@@ -928,139 +928,205 @@
         let darkMode = localStorage.getItem('darkMode') === 'true';
 
         // ==============================================
-        // ФУНКЦИИ ЗАГРУЗКИ НА ЯНДЕКС.ДИСК
-        // ==============================================
+// ИСПРАВЛЕННЫЕ ФУНКЦИИ ЗАГРУЗКИ НА ЯНДЕКС.ДИСК
+// ==============================================
 
-        async function uploadToYandexDisk(file) {
-            try {
-                // 1. Создаём уникальное имя файла
-                const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-                const path = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/${fileName}`);
-                
-                // 2. Получаем URL для загрузки
-                const uploadUrlResponse = await fetch(
-                    `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${path}&overwrite=true`,
-                    {
-                        headers: {
-                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
-                        }
-                    }
-                );
-                
-                if (!uploadUrlResponse.ok) {
-                    const error = await uploadUrlResponse.json();
-                    throw new Error(error.message || 'Не удалось получить URL для загрузки');
+// Проверка и создание папки
+async function ensureFolderExists() {
+    const folderPath = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}`);
+    
+    try {
+        // Проверяем, существует ли папка
+        const checkResponse = await fetch(
+            `https://cloud-api.yandex.net/v1/disk/resources?path=${folderPath}`,
+            {
+                headers: {
+                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
                 }
-                
-                const { href } = await uploadUrlResponse.json();
-                
-                // 3. Загружаем файл
-                const uploadResponse = await fetch(href, {
+            }
+        );
+        
+        if (checkResponse.status === 404) {
+            // Папка не существует - создаём
+            console.log('Папка не найдена, создаём...');
+            const createResponse = await fetch(
+                `https://cloud-api.yandex.net/v1/disk/resources?path=${folderPath}`,
+                {
                     method: 'PUT',
-                    body: file
-                });
-                
-                if (!uploadResponse.ok) {
-                    throw new Error('Ошибка при загрузке файла');
-                }
-                
-                // 4. Делаем файл публичным
-                const publishResponse = await fetch(
-                    `https://cloud-api.yandex.net/v1/disk/resources/publish?path=${path}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
-                        }
+                    headers: {
+                        'Authorization': `OAuth ${YANDEX_CONFIG.token}`
                     }
-                );
-                
-                if (!publishResponse.ok) {
-                    throw new Error('Не удалось опубликовать файл');
                 }
-                
-                // 5. Получаем метаданные файла с публичной ссылкой
-                const metaResponse = await fetch(
-                    `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
-                    {
-                        headers: {
-                            'Authorization': `OAuth ${YANDEX_CONFIG.token}`
-                        }
-                    }
-                );
-                
-                const meta = await metaResponse.json();
-                
-                // 6. Конвертируем публичную ссылку в прямую
-                const publicUrl = meta.public_url;
-                const fileId = publicUrl.split('/').pop();
-                const directUrl = `https://downloader.disk.yandex.ru/preview/${fileId}`;
-                
-                return directUrl;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки на Яндекс.Диск:', error);
-                throw error;
+            );
+            
+            if (!createResponse.ok) {
+                const error = await createResponse.json();
+                throw new Error(`Не удалось создать папку: ${error.message}`);
             }
+            console.log('Папка создана');
+        } else if (!checkResponse.ok) {
+            const error = await checkResponse.json();
+            throw new Error(`Ошибка проверки папки: ${error.message}`);
+        } else {
+            console.log('Папка существует');
         }
+    } catch (error) {
+        console.error('Ошибка при работе с папкой:', error);
+        throw error;
+    }
+}
 
-        async function uploadMultipleToYandex(files) {
-            const uploadButton = document.getElementById('uploadButton');
-            const progressDiv = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-
-            uploadButton.disabled = true;
-            progressDiv.style.display = 'block';
-
-            const uploadedImages = [];
-            let completed = 0;
-            let errors = 0;
-
-            for (const file of files) {
-                try {
-                    progressText.textContent = `Загрузка... ${Math.round((completed / files.length) * 100)}%`;
-                    
-                    const imageUrl = await uploadToYandexDisk(file);
-                    
-                    uploadedImages.push({
-                        src: imageUrl,
-                        name: file.name,
-                        date: new Date().toISOString(),
-                        id: Date.now() + Math.random() + file.name
-                    });
-
-                    completed++;
-                    const percent = (completed / files.length) * 100;
-                    progressFill.style.width = `${percent}%`;
-                    progressText.textContent = `Загрузка... ${Math.round(percent)}%`;
-
-                } catch (error) {
-                    errors++;
-                    console.error('Ошибка загрузки файла:', file.name, error);
+async function uploadToYandexDisk(file) {
+    try {
+        // Сначала убеждаемся, что папка существует
+        await ensureFolderExists();
+        
+        // Очищаем имя файла от спецсимволов
+        const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `${Date.now()}-${cleanFileName}`;
+        const path = encodeURIComponent(`disk:/${YANDEX_CONFIG.folder}/${fileName}`);
+        
+        console.log('Загружаем файл:', fileName);
+        
+        // Получаем URL для загрузки
+        const uploadUrlResponse = await fetch(
+            `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${path}&overwrite=true`,
+            {
+                headers: {
+                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
                 }
             }
-
-            if (uploadedImages.length > 0) {
-                if (!boards[currentBoard].images) {
-                    boards[currentBoard].images = [];
-                }
-                
-                boards[currentBoard].images.push(...uploadedImages);
-                saveToStorage();
-                renderGallery();
-                
-                alert(`Загружено ${uploadedImages.length} изображений${errors > 0 ? `, ${errors} ошибок` : ''}`);
-            } else {
-                alert('Не удалось загрузить ни одного файла');
-            }
-
-            uploadButton.disabled = false;
-            progressDiv.style.display = 'none';
-            progressFill.style.width = '0%';
-            document.getElementById('imageUpload').value = '';
+        );
+        
+        if (!uploadUrlResponse.ok) {
+            const error = await uploadUrlResponse.json();
+            console.error('Ошибка получения URL:', error);
+            throw new Error(error.message || 'Не удалось получить URL для загрузки');
         }
+        
+        const { href } = await uploadUrlResponse.json();
+        console.log('URL для загрузки получен');
+        
+        // Загружаем файл
+        const uploadResponse = await fetch(href, {
+            method: 'PUT',
+            body: file,
+            headers: {
+                'Content-Type': file.type
+            }
+        });
+        
+        if (!uploadResponse.ok) {
+            console.error('Ошибка загрузки:', uploadResponse.status, uploadResponse.statusText);
+            throw new Error(`Ошибка при загрузке файла: ${uploadResponse.status}`);
+        }
+        
+        console.log('Файл загружен, публикуем...');
+        
+        // Делаем файл публичным
+        const publishResponse = await fetch(
+            `https://cloud-api.yandex.net/v1/disk/resources/publish?path=${path}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                }
+            }
+        );
+        
+        if (!publishResponse.ok) {
+            const error = await publishResponse.json();
+            console.error('Ошибка публикации:', error);
+            throw new Error(`Не удалось опубликовать файл: ${error.message}`);
+        }
+        
+        // Получаем метаданные файла с публичной ссылкой
+        const metaResponse = await fetch(
+            `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
+            {
+                headers: {
+                    'Authorization': `OAuth ${YANDEX_CONFIG.token}`
+                }
+            }
+        );
+        
+        const meta = await metaResponse.json();
+        console.log('Метаданные получены');
+        
+        // Конвертируем публичную ссылку в прямую
+        const publicUrl = meta.public_url;
+        const fileId = publicUrl.split('/').pop();
+        const directUrl = `https://downloader.disk.yandex.ru/preview/${fileId}`;
+        
+        console.log('Готово, URL:', directUrl);
+        return directUrl;
+        
+    } catch (error) {
+        console.error('Детальная ошибка загрузки:', error);
+        throw error;
+    }
+}
 
+async function uploadMultipleToYandex(files) {
+    const uploadButton = document.getElementById('uploadButton');
+    const progressDiv = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
+    uploadButton.disabled = true;
+    progressDiv.style.display = 'block';
+
+    const uploadedImages = [];
+    let completed = 0;
+    let errors = [];
+
+    for (const file of files) {
+        try {
+            progressText.textContent = `Загрузка... ${Math.round((completed / files.length) * 100)}%`;
+            
+            const imageUrl = await uploadToYandexDisk(file);
+            
+            uploadedImages.push({
+                src: imageUrl,
+                name: file.name,
+                date: new Date().toISOString(),
+                id: Date.now() + Math.random() + file.name
+            });
+
+            completed++;
+            const percent = (completed / files.length) * 100;
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = `Загрузка... ${Math.round(percent)}%`;
+
+        } catch (error) {
+            errors.push(`${file.name}: ${error.message}`);
+            console.error('Ошибка загрузки файла:', file.name, error);
+        }
+    }
+
+    if (uploadedImages.length > 0) {
+        if (!boards[currentBoard].images) {
+            boards[currentBoard].images = [];
+        }
+        
+        boards[currentBoard].images.push(...uploadedImages);
+        saveToStorage();
+        renderGallery();
+        
+        let message = `✅ Загружено ${uploadedImages.length} из ${files.length}`;
+        if (errors.length > 0) {
+            message += `\n\n❌ Ошибки:\n${errors.join('\n')}`;
+        }
+        alert(message);
+    } else {
+        alert('❌ Не удалось загрузить ни одного файла.\n\n' + errors.join('\n'));
+    }
+
+    uploadButton.disabled = false;
+    progressDiv.style.display = 'none';
+    progressFill.style.width = '0%';
+    document.getElementById('imageUpload').value = '';
+}
         // ==============================================
         // ОСНОВНЫЕ ФУНКЦИИ ГАЛЕРЕИ
         // ==============================================
