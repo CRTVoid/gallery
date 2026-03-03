@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Pinterest галерея</title>
     <style>
-        /* ========== ВАШ ОРИГИНАЛЬНЫЙ CSS ========== */
+        /* ========== ТВОЙ ОРИГИНАЛЬНЫЙ CSS ========== */
         * {
             margin: 0;
             padding: 0;
@@ -868,6 +868,10 @@
             transform: translateX(24px);
         }
     </style>
+    
+    <!-- ===== Firebase SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="header">
@@ -972,102 +976,24 @@
     </div>
 
     <script>
-        // ========== ВАШ SECRET_KEY для ImageBan ==========
+        // ========== ТВОЙ SECRET_KEY для ImageBan ==========
         const SECRET_KEY = 'hELToqDFVXZDYjJgKH77sumGkQmPvn89w1F';
         
-        // ========== ИНТЕГРАЦИЯ С ЯНДЕКС.ДИСК ==========
-        const YANDEX_TOKEN = 'y0__xDgvdT3ARjHvD4gvvb5zhYu5mVVce8DtDhJj1_lg-nhuOrWxw';
-        const CONFIG_FILE = 'disk:/gallery/boards.json';
-        
-        // Функция загрузки данных на Яндекс.Диск
-        async function uploadToYandexDisk(data) {
-            try {
-                console.log('🔄 Сохраняем данные на Яндекс.Диск...');
-                
-                // Получаем ссылку для загрузки
-                const uploadUrlResponse = await fetch(
-                    `https://cloud-api.yandex.net/v1/disk/resources/upload?path=${encodeURIComponent(CONFIG_FILE)}&overwrite=true`,
-                    {
-                        headers: { 'Authorization': `OAuth ${YANDEX_TOKEN}` }
-                    }
-                );
-                
-                if (!uploadUrlResponse.ok) {
-                    console.error('Ошибка получения ссылки для загрузки:', await uploadUrlResponse.text());
-                    return false;
-                }
-                
-                const { href } = await uploadUrlResponse.json();
-                
-                // Загружаем данные по полученной ссылке
-                const uploadResponse = await fetch(href, {
-                    method: 'PUT',
-                    body: JSON.stringify(data, null, 2),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                
-                if (!uploadResponse.ok) {
-                    console.error('Ошибка загрузки данных:', await uploadResponse.text());
-                    return false;
-                }
-                
-                console.log('✅ Данные сохранены на Яндекс.Диск');
-                return true;
-            } catch (error) {
-                console.error('❌ Ошибка сохранения на Яндекс.Диск:', error);
-                return false;
-            }
-        }
+        // ========== НАСТРОЙКИ FIREBASE ==========
+        // 🔥 ВСТАВЬ СЮДА СВОЙ КОНФИГ ИЗ КОНСОЛИ FIREBASE 🔥
+        const firebaseConfig = {
+  apiKey: "AIzaSyADD4uLvzltakOTpBNGzCvtXmmfDDdkReg",
+  authDomain: "pint-2446b.firebaseapp.com",
+  projectId: "pint-2446b",
+  storageBucket: "pint-2446b.firebasestorage.app",
+  messagingSenderId: "232680666731",
+  appId: "1:232680666731:web:c940da5401d3a706ffe32e",
+  measurementId: "G-RE56PHXLJT"
+};
 
-        // Функция загрузки данных с Яндекс.Диска
-        async function downloadFromYandexDisk() {
-            try {
-                console.log('🔄 Загружаем данные с Яндекс.Диска...');
-                
-                // Получаем ссылку для скачивания
-                const downloadUrlResponse = await fetch(
-                    `https://cloud-api.yandex.net/v1/disk/resources/download?path=${encodeURIComponent(CONFIG_FILE)}`,
-                    {
-                        headers: { 'Authorization': `OAuth ${YANDEX_TOKEN}` }
-                    }
-                );
-                
-                // Если файл не существует, возвращаем null
-                if (downloadUrlResponse.status === 404) {
-                    console.log('📄 Файл boards.json ещё не создан');
-                    return null;
-                }
-                
-                if (!downloadUrlResponse.ok) {
-                    console.error('Ошибка получения ссылки для скачивания:', await downloadUrlResponse.text());
-                    return null;
-                }
-                
-                const { href } = await downloadUrlResponse.json();
-                
-                // Скачиваем данные
-                const response = await fetch(href);
-                if (!response.ok) {
-                    console.error('Ошибка скачивания данных:', await response.text());
-                    return null;
-                }
-                
-                // Получаем текст ответа
-                const text = await response.text();
-                
-                // Если файл пустой, возвращаем null
-                if (!text || text.trim() === '') {
-                    console.log('📄 Файл boards.json пустой');
-                    return null;
-                }
-                
-                // Парсим JSON
-                return JSON.parse(text);
-            } catch (error) {
-                console.error('❌ Ошибка загрузки с Яндекс.Диска:', error);
-                return null;
-            }
-        }
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
         
         // Состояние приложения
         let boards = {};
@@ -1082,36 +1008,98 @@
         // Настройки темы
         let darkMode = localStorage.getItem('darkMode') === 'true';
 
-        // Инициализация
-        async function init() {
-            // Сначала пробуем загрузить с Яндекс.Диска
-            const yandexData = await downloadFromYandexDisk();
-            
-            if (yandexData) {
-                // Применяем загруженные данные
-                if (yandexData.boards) boards = yandexData.boards;
-                if (yandexData.gridSettings) gridSettings = yandexData.gridSettings;
-                if (yandexData.darkMode !== undefined) {
-                    darkMode = yandexData.darkMode;
+        // ========== ФУНКЦИИ РАБОТЫ С FIREBASE ==========
+        
+        // Загрузка всех досок из Firestore
+        async function loadBoardsFromFirebase() {
+            try {
+                console.log('🔄 Загружаем доски из Firebase...');
+                const snapshot = await db.collection('boards').get();
+                
+                const loadedBoards = {};
+                snapshot.forEach(doc => {
+                    loadedBoards[doc.id] = doc.data();
+                });
+                
+                if (Object.keys(loadedBoards).length > 0) {
+                    boards = loadedBoards;
+                    console.log('✅ Доски загружены из Firebase');
+                    return true;
+                } else {
+                    console.log('📄 В Firebase пока нет досок');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Ошибка загрузки из Firebase:', error);
+                return false;
+            }
+        }
+
+        // Сохранение всех досок в Firestore
+        async function saveBoardsToFirebase() {
+            try {
+                console.log('🔄 Сохраняем доски в Firebase...');
+                
+                // Создаём batch для атомарной записи
+                const batch = db.batch();
+                
+                // Получаем все существующие документы
+                const snapshot = await db.collection('boards').get();
+                
+                // Удаляем старые документы (если нужна полная замена)
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                
+                // Добавляем все текущие доски
+                for (const [boardName, boardData] of Object.entries(boards)) {
+                    const docRef = db.collection('boards').doc(boardName);
+                    batch.set(docRef, boardData);
                 }
                 
-                // Сохраняем в localStorage для офлайн-доступа
-                localStorage.setItem('boards', JSON.stringify(boards));
-                localStorage.setItem('gridSettings', JSON.stringify(gridSettings));
-                localStorage.setItem('darkMode', darkMode);
+                // Выполняем batch
+                await batch.commit();
                 
-                showStatus('✅ Данные загружены с Яндекс.Диска', 'success');
-            } else {
-                // Если на диске нет данных, используем localStorage
+                console.log('✅ Доски сохранены в Firebase');
+                return true;
+            } catch (error) {
+                console.error('❌ Ошибка сохранения в Firebase:', error);
+                return false;
+            }
+        }
+
+        // Инициализация
+        async function init() {
+            // Сначала пробуем загрузить с Firebase
+            const loaded = await loadBoardsFromFirebase();
+            
+            if (!loaded) {
+                // Если в Firebase пусто, используем localStorage
                 boards = JSON.parse(localStorage.getItem('boards')) || {
                     'Основная': { password: null, images: [] }
                 };
+                // И сохраняем в Firebase
+                await saveBoardsToFirebase();
             }
             
             applyTheme();
             applyGridSettingsFromStorage();
             renderBoards();
             renderGallery();
+        }
+
+        // Сохранение (локально + Firebase)
+        async function saveToStorage() {
+            localStorage.setItem('boards', JSON.stringify(boards));
+            
+            // Сохраняем в Firebase в фоне
+            saveBoardsToFirebase().then(success => {
+                if (success) {
+                    showStatus('💾 Синхронизация с Firebase выполнена', 'success');
+                } else {
+                    showStatus('❌ Ошибка синхронизации с Firebase', 'error');
+                }
+            });
         }
 
         // Применение темы
@@ -1128,7 +1116,7 @@
             darkMode = !darkMode;
             localStorage.setItem('darkMode', darkMode);
             applyTheme();
-            saveToStorage(); // Сохраняем на Яндекс.Диск
+            saveToStorage();
             renderBoards();
         }
 
@@ -1145,7 +1133,7 @@
             localStorage.setItem('gridSettings', JSON.stringify(gridSettings));
             const gallery = document.getElementById('gallery');
             gallery.setAttribute('data-columns', gridSettings.columns);
-            saveToStorage(); // Сохраняем на Яндекс.Диск
+            saveToStorage();
         }
 
         // Открытие модального окна настройки сетки
@@ -1175,56 +1163,24 @@
             document.getElementById('gridValue').textContent = e.target.value;
         });
 
-        // Сохранение в localStorage и синхронизация с Яндекс.Диском
-        async function saveToStorage() {
-            localStorage.setItem('boards', JSON.stringify(boards));
-            
-            // Сохраняем на Яндекс.Диск в фоне
-            const dataToSave = {
-                boards: boards,
-                gridSettings: gridSettings,
-                darkMode: darkMode,
-                lastSync: new Date().toISOString()
-            };
-            
-            // Не ждём завершения, чтобы не тормозить интерфейс
-            uploadToYandexDisk(dataToSave).then(success => {
-                if (success) {
-                    showStatus('💾 Синхронизация с Яндекс.Диском выполнена', 'success');
-                } else {
-                    showStatus('❌ Ошибка синхронизации с Яндекс.Диском', 'error');
-                }
-            });
-        }
-
-        // Функция ручной синхронизации
-        async function syncWithYandexDisk() {
-            showStatus('🔄 Синхронизация с Яндекс.Диском...', 'loading');
+        // Функция ручной синхронизации с Firebase
+        async function syncWithFirebase() {
+            showStatus('🔄 Синхронизация с Firebase...', 'loading');
             await saveToStorage();
         }
 
-        // Функция принудительной загрузки с диска
-        async function forceLoadFromDisk() {
-            showStatus('🔄 Загрузка с Яндекс.Диска...', 'loading');
-            const yandexData = await downloadFromYandexDisk();
+        // Функция принудительной загрузки из Firebase
+        async function forceLoadFromFirebase() {
+            showStatus('🔄 Загрузка из Firebase...', 'loading');
+            const loaded = await loadBoardsFromFirebase();
             
-            if (yandexData) {
-                if (yandexData.boards) boards = yandexData.boards;
-                if (yandexData.gridSettings) gridSettings = yandexData.gridSettings;
-                if (yandexData.darkMode !== undefined) {
-                    darkMode = yandexData.darkMode;
-                    applyTheme();
-                }
-                
+            if (loaded) {
                 localStorage.setItem('boards', JSON.stringify(boards));
-                localStorage.setItem('gridSettings', JSON.stringify(gridSettings));
-                localStorage.setItem('darkMode', darkMode);
-                
                 renderBoards();
                 renderGallery();
-                showStatus('✅ Данные загружены с Яндекс.Диска', 'success');
+                showStatus('✅ Данные загружены из Firebase', 'success');
             } else {
-                showStatus('❌ Не удалось загрузить данные с Яндекс.Диска', 'error');
+                showStatus('❌ Не удалось загрузить данные из Firebase', 'error');
             }
         }
 
@@ -1232,7 +1188,7 @@
         function clearLocalStorage() {
             showConfirmDialog(
                 'Очистка localStorage',
-                'Вы уверены, что хотите очистить localStorage? Это удалит все локальные данные, но данные на Яндекс.Диске сохранятся. После очистки страница перезагрузится.',
+                'Вы уверены, что хотите очистить localStorage? Это удалит все локальные данные, но данные в Firebase сохранятся. После очистки страница перезагрузится.',
                 () => {
                     localStorage.clear();
                     showStatus('✅ localStorage очищен, перезагрузка...', 'success');
@@ -1295,8 +1251,8 @@
                     <div class="menu-item" onclick="toggleUploadForm()">📤 Загрузить изображения</div>
                     <div class="menu-item" onclick="enterDeleteMode()">🗑 Удалить изображения</div>
                     <div class="menu-divider"></div>
-                    <div class="menu-item" onclick="syncWithYandexDisk()">☁️ Синхронизировать с Яндекс.Диском</div>
-                    <div class="menu-item" onclick="forceLoadFromDisk()">📥 Загрузить с диска</div>
+                    <div class="menu-item" onclick="syncWithFirebase()">☁️ Синхронизировать с Firebase</div>
+                    <div class="menu-item" onclick="forceLoadFromFirebase()">📥 Загрузить из Firebase</div>
                     <div class="menu-item" onclick="clearLocalStorage()">🧹 Очистить localStorage</div>
                     <div class="menu-divider"></div>
                     <div class="menu-item dark-mode-toggle" onclick="toggleDarkMode()">
@@ -1579,7 +1535,7 @@
                             }
                             
                             boards[currentBoard].images.push(imageObj);
-                            saveToStorage();
+                            await saveToStorage();
                             
                             successCount++;
                         } else {
