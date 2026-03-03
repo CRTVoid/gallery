@@ -2,328 +2,275 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Pinterest галерея</title>
     <style>
+        /* Базовые стили для чистоты */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #f4f4f4;
+            color: #333;
             padding: 20px;
         }
-
         .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
         }
-
         h1 {
-            color: #333;
             font-size: 28px;
         }
-
         .boards-container {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
             align-items: center;
         }
-
         .board-btn {
             padding: 10px 20px;
             background-color: white;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #ddd;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-
-        .board-btn:hover {
-            background-color: #e0e0e0;
-        }
-
         .board-btn.active {
             background-color: #bd081c;
             color: white;
             border-color: #bd081c;
         }
-
-        .control-buttons {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-        }
-
-        .menu-btn {
+        .control-btn {
             width: 45px;
             height: 45px;
             border-radius: 50%;
             background-color: #4CAF50;
             color: white;
             border: none;
+            font-size: 24px;
             cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-left: auto;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-
         .upload-section {
             display: none;
-            margin: 20px 0;
+            margin-bottom: 30px;
             padding: 20px;
             background-color: white;
             border-radius: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .upload-section.show {
+        .upload-section.visible {
             display: block;
         }
-
         .upload-form {
             display: flex;
             gap: 15px;
             align-items: center;
             flex-wrap: wrap;
         }
-
         .upload-form input[type="file"] {
             flex: 1;
-            padding: 10px;
-            border: 2px dashed #ddd;
+            padding: 12px;
+            border: 2px dashed #ccc;
             border-radius: 8px;
         }
-
         .upload-form button {
-            padding: 10px 30px;
+            padding: 12px 30px;
             background-color: #bd081c;
             color: white;
             border: none;
-            border-radius: 25px;
-            cursor: pointer;
+            border-radius: 30px;
             font-size: 16px;
+            cursor: pointer;
         }
-
-        .upload-form button:hover {
-            background-color: #8f0615;
+        .upload-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
-
         .gallery {
             column-count: 4;
             column-gap: 15px;
-            width: 100%;
-            max-width: 1600px;
-            margin: 0 auto;
         }
-
         .gallery-item {
             break-inside: avoid;
             margin-bottom: 15px;
-            position: relative;
-            display: inline-block;
-            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
         }
-
+        .gallery-item:hover {
+            transform: scale(1.02);
+        }
         .gallery-item img {
             width: 100%;
             height: auto;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: block;
             cursor: pointer;
         }
-
         .empty-gallery {
+            grid-column: 1 / -1;
             text-align: center;
             padding: 60px;
-            color: #666;
-            font-size: 16px;
-            background-color: white;
+            color: #999;
+            font-size: 18px;
+            background: white;
             border-radius: 16px;
         }
-
-        @media (max-width: 1200px) {
-            .gallery { column-count: 3; }
-        }
-        @media (max-width: 900px) {
-            .gallery { column-count: 2; }
-        }
-        @media (max-width: 600px) {
-            .gallery { column-count: 1; }
-        }
+        @media (max-width: 1200px) { .gallery { column-count: 3; } }
+        @media (max-width: 900px) { .gallery { column-count: 2; } }
+        @media (max-width: 600px) { .gallery { column-count: 1; } }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Моя Pinterest галерея</h1>
+        <h1>📌 Моя галерея</h1>
     </div>
 
     <div class="boards-container" id="boardsContainer">
-        <button class="board-btn active">Основная</button>
-        <div class="control-buttons">
-            <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        </div>
+        <button class="board-btn active" data-board="Основная">Основная</button>
+        <button class="control-btn" id="menuToggle" title="Меню">☰</button>
     </div>
 
     <div class="upload-section" id="uploadSection">
         <form class="upload-form" id="uploadForm">
             <input type="file" id="imageUpload" accept="image/*" multiple required>
-            <button type="submit">Загрузить изображения</button>
+            <button type="submit" id="submitUpload">Загрузить</button>
         </form>
     </div>
 
     <div class="gallery" id="gallery">
-        <div class="empty-gallery">Загрузите изображения</div>
+        <div class="empty-gallery">Загрузите изображения, чтобы они появились здесь</div>
     </div>
 
     <script>
-        // === РАБОЧИЙ КОД С POSTIMAGE ===
-        
-        let boards = {
-            'Основная': { images: [] }
-        };
-        let currentBoard = 'Основная';
+        (function() {
+            // --- Состояние приложения ---
+            let boards = {
+                'Основная': { images: [] }
+            };
+            let currentBoard = 'Основная';
 
-        function toggleMenu() {
-            document.getElementById('uploadSection').classList.toggle('show');
-        }
+            // --- Элементы DOM ---
+            const galleryEl = document.getElementById('gallery');
+            const uploadSection = document.getElementById('uploadSection');
+            const menuToggle = document.getElementById('menuToggle');
+            const uploadForm = document.getElementById('uploadForm');
+            const fileInput = document.getElementById('imageUpload');
+            const submitBtn = document.getElementById('submitUpload');
 
-        // Загрузка на PostImage (работает без ключей)
-        async function uploadToPostImage(file) {
-            return new Promise((resolve, reject) => {
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                // Используем iframe для обхода CORS
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-                
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'https://postimages.org/';
-                form.target = iframe.name = 'upload_' + Date.now();
-                form.enctype = 'multipart/form-data';
-                
-                // Добавляем файл
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.name = 'file';
-                input.files = file instanceof File ? (() => {
-                    const dt = new DataTransfer();
-                    dt.items.add(file);
-                    return dt.files;
-                })() : file;
-                form.appendChild(input);
-                
-                // Добавляем скрытые поля
-                const fields = {
-                    'upload': '1',
-                    'optsize': '0',
-                    'expire': '0'
-                };
-                
-                for (const [name, value] of Object.entries(fields)) {
-                    const hidden = document.createElement('input');
-                    hidden.type = 'hidden';
-                    hidden.name = name;
-                    hidden.value = value;
-                    form.appendChild(hidden);
-                }
-                
-                document.body.appendChild(form);
-                
-                // Отслеживаем загрузку iframe
-                iframe.onload = function() {
+            // --- Вспомогательные функции ---
+            function saveToLocalStorage() {
+                localStorage.setItem('pinterest_gallery_boards', JSON.stringify(boards));
+            }
+
+            function loadFromLocalStorage() {
+                const saved = localStorage.getItem('pinterest_gallery_boards');
+                if (saved) {
                     try {
-                        const content = iframe.contentDocument || iframe.contentWindow.document;
-                        const html = content.body.innerHTML;
-                        
-                        // Ищем прямую ссылку
-                        const urlMatch = html.match(/https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp)/i);
-                        if (urlMatch) {
-                            resolve(urlMatch[0]);
-                        } else {
-                            reject('Не удалось найти ссылку');
-                        }
+                        boards = JSON.parse(saved);
+                        // Убедимся, что у основной доски есть массив images
+                        if (!boards['Основная']) boards['Основная'] = { images: [] };
                     } catch (e) {
-                        reject('Ошибка загрузки');
+                        console.warn("Не удалось загрузить сохраненные данные", e);
                     }
-                    
-                    // Очистка
-                    setTimeout(() => {
-                        document.body.removeChild(form);
-                        document.body.removeChild(iframe);
-                    }, 1000);
-                };
-                
-                form.submit();
-            });
-        }
-
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const files = document.getElementById('imageUpload').files;
-            if (files.length === 0) return;
-
-            const uploaded = [];
-
-            for (const file of files) {
-                try {
-                    const url = await uploadToPostImage(file);
-                    uploaded.push({
-                        src: url,
-                        name: file.name,
-                        id: Date.now() + Math.random() + file.name
-                    });
-                } catch (error) {
-                    alert('Ошибка загрузки: ' + error);
                 }
             }
 
-            if (uploaded.length > 0) {
-                boards[currentBoard].images.push(...uploaded);
-                renderGallery();
-                alert(`Загружено ${uploaded.length} изображений`);
+            // --- Отрисовка галереи ---
+            function renderGallery() {
+                const images = boards[currentBoard]?.images || [];
+                if (images.length === 0) {
+                    galleryEl.innerHTML = '<div class="empty-gallery">Загрузите изображения, чтобы они появились здесь</div>';
+                    return;
+                }
+                let html = '';
+                images.forEach(img => {
+                    html += `<div class="gallery-item"><img src="${img.src}" alt="${img.name || 'Image'}" onclick="window.open('${img.src}', '_blank')" loading="lazy"></div>`;
+                });
+                galleryEl.innerHTML = html;
             }
 
-            document.getElementById('imageUpload').value = '';
-            document.getElementById('uploadSection').classList.remove('show');
-        });
-
-        function renderGallery() {
-            const gallery = document.getElementById('gallery');
-            const images = boards[currentBoard]?.images || [];
-
-            if (images.length === 0) {
-                gallery.innerHTML = '<div class="empty-gallery">Загрузите изображения</div>';
-                return;
-            }
-
-            let html = '';
-            images.forEach(img => {
-                html += `
-                    <div class="gallery-item">
-                        <img src="${img.src}" onclick="window.open('${img.src}')" loading="lazy">
-                    </div>
-                `;
+            // --- Переключение меню загрузки ---
+            menuToggle.addEventListener('click', () => {
+                uploadSection.classList.toggle('visible');
             });
-            
-            gallery.innerHTML = html;
-        }
 
-        renderGallery();
+            // --- Загрузка на Catbox.moe ---
+            async function uploadFiles(files) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Загрузка...';
+
+                const uploadedImages = [];
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const formData = new FormData();
+                    formData.append('reqtype', 'fileupload');
+                    formData.append('userhash', '');
+                    formData.append('fileToUpload', file);
+
+                    try {
+                        const response = await fetch('https://catbox.moe/user/api.php', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ошибка ${response.status}`);
+                        }
+
+                        const imageUrl = await response.text();
+                        // Catbox возвращает просто URL строкой
+                        if (imageUrl.startsWith('http')) {
+                            uploadedImages.push({
+                                src: imageUrl,
+                                name: file.name,
+                                id: Date.now() + i + Math.random()
+                            });
+                        } else {
+                            throw new Error('Некорректный ответ от сервера');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка загрузки файла', file.name, error);
+                        alert(`Ошибка загрузки ${file.name}: ${error.message}`);
+                    }
+                }
+
+                if (uploadedImages.length > 0) {
+                    boards[currentBoard].images.push(...uploadedImages);
+                    saveToLocalStorage();
+                    renderGallery();
+                    alert(`✅ Загружено ${uploadedImages.length} из ${files.length}`);
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Загрузить';
+                fileInput.value = '';
+            }
+
+            // --- Обработчик отправки формы ---
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const files = fileInput.files;
+                if (files.length === 0) return;
+                await uploadFiles(Array.from(files));
+                uploadSection.classList.remove('visible');
+            });
+
+            // --- Инициализация ---
+            loadFromLocalStorage();
+            renderGallery();
+        })();
     </script>
 </body>
 </html>
