@@ -85,6 +85,12 @@
             position: relative;
         }
 
+        /* Контейнер для бургера и меню */
+        .menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
         /* Кнопка-бургер */
         .menu-btn {
             width: 45px;
@@ -118,125 +124,14 @@
             transition: background-color 0.3s;
         }
 
-        /* Контейнер для досок с горизонтальным скроллом */
-        .boards-scroll-wrapper {
-            position: relative;
-            flex: 1;
-            overflow: hidden;
-            padding: 5px 0 15px 0;
-        }
-
-        .boards-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            padding-bottom: 10px;
-            margin-bottom: -5px;
-            scroll-behavior: smooth;
-        }
-
-        /* Стили для скроллбара */
-        .boards-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .boards-scroll::-webkit-scrollbar-track {
-            background: var(--border-color);
-            border-radius: 6px;
-            margin: 0 20px;
-        }
-
-        .boards-scroll::-webkit-scrollbar-thumb {
-            background: #bd081c;
-            border-radius: 6px;
-        }
-
-        .boards-scroll::-webkit-scrollbar-thumb:hover {
-            background: #8f0615;
-        }
-
-        /* Кнопки досок */
-        .board-btn {
-            padding: 8px 16px;
-            background-color: var(--board-bg);
-            border: 2px solid var(--board-border);
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text-color);
-            flex-shrink: 0;
-            white-space: nowrap;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        .board-btn.active {
-            background-color: #bd081c;
-            color: white;
-            border-color: #bd081c;
-        }
-
-        .board-btn.protected {
-            border-color: #ff6b6b;
-            position: relative;
-            padding-right: 35px;
-        }
-
-        .board-btn.protected::after {
-            content: "🔒";
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-        }
-
-        /* Градиентные маски */
-        .boards-scroll-wrapper::before,
-        .boards-scroll-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 15px;
-            width: 40px;
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .boards-scroll-wrapper::before {
-            left: 0;
-            background: linear-gradient(to right, var(--bg-color), transparent);
-        }
-
-        .boards-scroll-wrapper::after {
-            right: 0;
-            background: linear-gradient(to left, var(--bg-color), transparent);
-        }
-
-        .boards-scroll-wrapper.show-left::before {
-            opacity: 1;
-        }
-
-        .boards-scroll-wrapper.show-right::after {
-            opacity: 1;
-        }
-
-        /* Выпадающее меню - центрированное */
+        /* Выпадающее меню */
         #dropdownMenu {
             display: none;
-            position: fixed;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: absolute;
+/*            top: 55px;*/
+/*            left: 0;*/
             background-color: var(--dropdown-bg);
-            min-width: 280px;
-            max-width: 90%;
+            min-width: 250px;
             box-shadow: 0 8px 16px var(--dropdown-shadow);
             border-radius: 16px;
             z-index: 9999;
@@ -246,6 +141,13 @@
 
         #dropdownMenu.show {
             display: block;
+        }
+
+        /* На маленьких экранах корректировка */
+        @media (max-width: 480px) {
+            #dropdownMenu {
+/*                left: -10px;*/
+            }
         }
 
         .menu-item {
@@ -286,6 +188,141 @@
         body.dark-mode .menu-item.delete:hover {
             background-color: #442326;
         }
+
+        /* Контейнер для досок с горизонтальным скроллом */
+.boards-scroll-wrapper {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    padding: 5px 0 5px 0; /* Уменьшил нижний отступ, так как скроллбара нет */
+}
+
+.boards-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Для Firefox - убирает скроллбар */
+    padding-bottom: 0; /* Убрал padding */
+    margin-bottom: 0; /* Убрал margin */
+    scroll-behavior: smooth;
+}
+
+/* Для Chrome, Safari, Edge - убираем скроллбар */
+.boards-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+        /* Кнопки досок */
+        .board-btn {
+            padding: 8px 16px;
+            background-color: transparent;
+            border: 1px solid var(--board-border);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 200;
+            color: var(--text-color);
+            flex-shrink: 0;
+            white-space: nowrap;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .board-btn.active {
+            background-color: #bd081c;
+            color: white;
+            font-weight: 700;
+            border-color: #bd081c;
+        }
+
+        .board-btn.protected {
+            border-color: #ff6b6b;
+            position: relative;
+            padding-right: 35px;
+        }
+
+        .board-btn.protected::after {
+            content: "🔒";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+       /* Контейнер для досок с горизонтальным скроллом */
+.boards-scroll-wrapper {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    padding: 5px 0;
+}
+
+.boards-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    padding: 2px 0; /* Небольшой внутренний отступ, чтобы контент не касался краёв */
+}
+
+.boards-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Градиентные маски */
+.boards-scroll-wrapper::before,
+.boards-scroll-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 70px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.boards-scroll-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-color), transparent 90%);
+}
+
+.boards-scroll-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-color), transparent 90%);
+}
+
+/* Левый градиент показываем только когда прокрутили не в начало */
+.boards-scroll-wrapper.show-left::before {
+    opacity: 1;
+}
+
+/* Правый градиент показываем всегда, если есть что скроллить */
+.boards-scroll-wrapper.show-right::after {
+    opacity: 1;
+}
+
+/* Маска для всего контейнера - убираем левую маску по умолчанию */
+.boards-scroll-wrapper {
+    -webkit-mask-image: linear-gradient(to right, 
+        black 0px, 
+        black 20px, 
+        black calc(100% - 20px), 
+        black 100%);
+    mask-image: linear-gradient(to right, 
+        black 0px, 
+        black 20px, 
+        black calc(100% - 20px), 
+        black 100%);
+}
 
         /* Форма создания доски */
         .create-board-form {
@@ -933,7 +970,7 @@
     <!-- Кнопки досок + меню -->
     <div class="boards-container" id="boardsContainer"></div>
 
-    <!-- Выпадающее меню - центрированное -->
+    <!-- Выпадающее меню - привязано к бургеру -->
     <div id="dropdownMenu">
         <div class="menu-item" onclick="toggleCreateBoardForm()">Создать новую доску</div>
         <div class="menu-item" onclick="toggleUploadForm()">Загрузить изображения</div>
@@ -1169,7 +1206,6 @@
             
             if (!loaded) {
                 boards = JSON.parse(localStorage.getItem('boards')) || {
-                    'Основная': { password: null, images: [] }
                 };
                 await saveBoardsToFirebase(false);
             }
@@ -1289,132 +1325,135 @@
         }
 
         // Переключение меню
-function toggleMenu(event) {
-    if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-    
-    const dropdown = document.getElementById('dropdownMenu');
-    if (!dropdown) return;
-    
-    dropdown.classList.toggle('show');
-    
-    if (dropdown.classList.contains('show')) {
-        if ('ontouchstart' in window) {
-            document.addEventListener('touchstart', closeMenuOnClickOutside);
-        } else {
-            document.addEventListener('click', closeMenuOnClickOutside);
+        function toggleMenu(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const dropdown = document.getElementById('dropdownMenu');
+            if (!dropdown) return;
+            
+            dropdown.classList.toggle('show');
+            
+            if (dropdown.classList.contains('show')) {
+                if ('ontouchstart' in window) {
+                    document.addEventListener('touchstart', closeMenuOnClickOutside);
+                } else {
+                    document.addEventListener('click', closeMenuOnClickOutside);
+                }
+            }
         }
-    }
-}
 
-// Закрыть меню
-function closeMenu() {
-    const dropdown = document.getElementById('dropdownMenu');
-    if (dropdown) {
-        dropdown.classList.remove('show');
-    }
-}
-
-function closeMenuOnClickOutside(event) {
-    const dropdown = document.getElementById('dropdownMenu');
-    const menuBtn = document.querySelector('.menu-btn');
-    
-    if (!dropdown.contains(event.target) && !menuBtn.contains(event.target)) {
-        dropdown.classList.remove('show');
-        if ('ontouchstart' in window) {
-            document.removeEventListener('touchstart', closeMenuOnClickOutside);
-        } else {
-            document.removeEventListener('click', closeMenuOnClickOutside);
+        // Закрыть меню
+        function closeMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
         }
-    }
-}
+
+        function closeMenuOnClickOutside(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const menuBtn = document.querySelector('.menu-btn');
+            
+            if (!dropdown.contains(event.target) && !menuBtn.contains(event.target)) {
+                dropdown.classList.remove('show');
+                if ('ontouchstart' in window) {
+                    document.removeEventListener('touchstart', closeMenuOnClickOutside);
+                } else {
+                    document.removeEventListener('click', closeMenuOnClickOutside);
+                }
+            }
+        }
 
         // Отображение кнопок досок
-        function renderBoards() {
-            const container = document.getElementById('boardsContainer');
-            container.innerHTML = '';
+function renderBoards() {
+    const container = document.getElementById('boardsContainer');
+    container.innerHTML = '';
 
-            // Кнопка-бургер
-            const menuBtn = document.createElement('div');
-            menuBtn.className = 'menu-btn';
-            menuBtn.title = 'Меню';
-            menuBtn.setAttribute('role', 'button');
-            menuBtn.setAttribute('tabindex', '0');
-            
-            for (let i = 0; i < 3; i++) {
-                const span = document.createElement('span');
-                menuBtn.appendChild(span);
-            }
-            
-            menuBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleMenu(e);
-            });
-            
-            menuBtn.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleMenu(e);
-                }
-            });
+    // Контейнер для бургера и меню
+    const menuContainer = document.createElement('div');
+    menuContainer.className = 'menu-container';
 
-            container.appendChild(menuBtn);
-
-            // Wrapper для маски и скролла
-            const scrollWrapper = document.createElement('div');
-            scrollWrapper.className = 'boards-scroll-wrapper';
-
-            // Контейнер для досок
-            const boardsScroll = document.createElement('div');
-            boardsScroll.className = 'boards-scroll';
-            
-            boardsScroll.addEventListener('scroll', updateScrollMasks);
-
-            const oldScrollPos = sessionStorage.getItem('boardsScrollPos_' + currentBoard);
-            
-            Object.keys(boards).forEach(boardName => {
-                const btn = document.createElement('button');
-                btn.className = `board-btn ${boardName === currentBoard ? 'active' : ''} ${boards[boardName].password ? 'protected' : ''}`;
-                btn.textContent = boardName;
-                
-                btn.addEventListener('click', () => {
-                    sessionStorage.setItem('boardsScrollPos_' + currentBoard, boardsScroll.scrollLeft);
-                    switchBoard(boardName);
-                });
-                
-                boardsScroll.appendChild(btn);
-            });
-
-            scrollWrapper.appendChild(boardsScroll);
-            container.appendChild(scrollWrapper);
-
-            setTimeout(() => {
-                if (oldScrollPos) {
-                    boardsScroll.scrollLeft = parseInt(oldScrollPos);
-                }
-                updateScrollMasks();
-            }, 0);
+    // Кнопка-бургер
+    const menuBtn = document.createElement('div');
+    menuBtn.className = 'menu-btn';
+    menuBtn.title = 'Меню';
+    menuBtn.setAttribute('role', 'button');
+    menuBtn.setAttribute('tabindex', '0');
+    
+    for (let i = 0; i < 3; i++) {
+        const span = document.createElement('span');
+        menuBtn.appendChild(span);
+    }
+    
+    menuBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu(e);
+    });
+    
+    menuBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleMenu(e);
         }
+    });
+
+    menuContainer.appendChild(menuBtn);
+    container.appendChild(menuContainer);
+
+    // Wrapper для маски и скролла
+    const scrollWrapper = document.createElement('div');
+    scrollWrapper.className = 'boards-scroll-wrapper';
+
+    // Контейнер для досок
+    const boardsScroll = document.createElement('div');
+    boardsScroll.className = 'boards-scroll';
+    
+    boardsScroll.addEventListener('scroll', updateScrollMasks);
+
+    // Создаём кнопки досок
+    const boardButtons = [];
+    Object.keys(boards).forEach(boardName => {
+        const btn = document.createElement('button');
+        btn.className = `board-btn ${boardName === currentBoard ? 'active' : ''} ${boards[boardName].password ? 'protected' : ''}`;
+        btn.textContent = boardName;
+        
+        btn.addEventListener('click', () => {
+            // НЕ сохраняем позицию, просто переключаем доску
+            switchBoard(boardName);
+        });
+        
+        boardsScroll.appendChild(btn);
+        boardButtons.push(btn);
+    });
+
+    scrollWrapper.appendChild(boardsScroll);
+    container.appendChild(scrollWrapper);
+
+    // НИЧЕГО не делаем со скроллом — он остаётся как есть
+    updateScrollMasks();
+}
 
         // Переключение доски
-        function switchBoard(boardName) {
-            const boardsScroll = document.querySelector('.boards-scroll');
-            if (boardsScroll) {
-                sessionStorage.setItem('boardsScrollPos_' + currentBoard, boardsScroll.scrollLeft);
-            }
-            
-            if (boards[boardName].password) {
-                pendingBoardAccess = boardName;
-                document.getElementById('passwordModal').style.display = 'flex';
-            } else {
-                currentBoard = boardName;
-                renderBoards();
-                renderGallery();
-            }
-        }
+function switchBoard(boardName) {
+    const boardsScroll = document.querySelector('.boards-scroll');
+    if (boardsScroll) {
+        // Сохраняем позицию для текущей доски перед уходом
+        sessionStorage.setItem('boardsScrollPos_' + currentBoard, boardsScroll.scrollLeft);
+    }
+    
+    if (boards[boardName].password) {
+        pendingBoardAccess = boardName;
+        document.getElementById('passwordModal').style.display = 'flex';
+    } else {
+        currentBoard = boardName;
+        renderBoards();
+        renderGallery();
+    }
+}
 
         // Перемешивание изображений
         function shuffleImages() {
@@ -1519,22 +1558,21 @@ function closeMenuOnClickOutside(event) {
         }
 
         // Показать модальное окно удаления доски
-        function showDeleteBoardModal() {
-            const select = document.getElementById('boardToDelete');
-            select.innerHTML = '';
-            
-            Object.keys(boards).forEach(boardName => {
-                if (boardName !== 'Основная') {
-                    const option = document.createElement('option');
-                    option.value = boardName;
-                    option.textContent = boardName + (boards[boardName].password ? ' (защищена)' : '');
-                    select.appendChild(option);
-                }
-            });
-            
-            document.getElementById('deleteBoardModal').style.display = 'flex';
-            closeMenu();
-        }
+function showDeleteBoardModal() {
+    const select = document.getElementById('boardToDelete');
+    select.innerHTML = '';
+    
+    Object.keys(boards).forEach(boardName => {
+        // Убрали проверку boardName !== 'Основная'
+        const option = document.createElement('option');
+        option.value = boardName;
+        option.textContent = boardName + (boards[boardName].password ? ' (защищена)' : '');
+        select.appendChild(option);
+    });
+    
+    document.getElementById('deleteBoardModal').style.display = 'flex';
+    closeMenu();
+}
 
         function closeDeleteBoardModal() {
             document.getElementById('deleteBoardModal').style.display = 'none';
