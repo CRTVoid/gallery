@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Pinterest галерея</title>
+    <!-- PWA мета-теги -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Patchwork">
+    <meta name="theme-color" content="#bd081c">
+    <title>Patchwork</title>
     <!-- Подключаем шрифт Nunito -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1903,5 +1909,19 @@ function showDeleteBoardModal() {
         // Инициализация
         init();
     </script>
+<script>
+    // Регистрация Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker зарегистрирован:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Ошибка регистрации ServiceWorker:', error);
+                });
+        });
+    }
+</script>
 </body>
 </html>
